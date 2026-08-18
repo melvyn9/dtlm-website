@@ -1,0 +1,110 @@
+---
+/**
+ * Site header.
+ *
+ * Deliberately has no JavaScript. There is no hamburger toggle: on narrow
+ * viewports the navigation wraps to a second line instead of hiding behind
+ * a button that would not open with JS disabled (§2.1).
+ *
+ * aria-current="page" marks the active item — this is the accessible
+ * equivalent of the visual underline, and costs nothing.
+ */
+import { SITE, NAV } from '../consts.js';
+import t from '../i18n/en.js';
+import { withBase } from '../lib/url';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => {
+  const full = withBase(href);
+  return href === '/' ? path === full : path === full || path.startsWith(full);
+};
+---
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="site-header__brand" href={withBase('/')}>
+      <span class="site-header__name">{SITE.name}</span>
+      <span class="site-header__tagline">{SITE.tagline}</span>
+    </a>
+
+    <nav aria-label={t['nav.primary']}>
+      <ul class="site-header__nav">
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={withBase(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {t[item.key]}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-block-end: 1px solid var(--rule);
+    background: var(--paper);
+  }
+
+  .site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s) var(--space-l);
+    padding-block: var(--space-m);
+  }
+
+  .site-header__brand {
+    color: var(--ink);
+    text-decoration: none;
+    display: block;
+  }
+
+  .site-header__name {
+    display: block;
+    font-size: var(--step-1);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+
+  .site-header__tagline {
+    display: block;
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    margin-block-start: var(--space-3xs);
+  }
+
+  .site-header__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s) var(--space-m);
+    list-style: none;
+    padding: 0;
+  }
+
+  .site-header__nav a {
+    color: var(--ink-muted);
+    text-decoration: none;
+    font-size: var(--step--1);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    /* 24×24px minimum target (§7) — padding does the work, not a fixed size. */
+    display: inline-block;
+    padding-block: var(--space-3xs);
+    border-block-end: 1px solid transparent;
+  }
+
+  .site-header__nav a:hover {
+    color: var(--ink);
+    border-block-end-color: var(--ink);
+  }
+
+  .site-header__nav a[aria-current='page'] {
+    color: var(--ink);
+    border-block-end-color: var(--ink);
+  }
+</style>

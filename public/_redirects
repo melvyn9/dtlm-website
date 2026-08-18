@@ -1,0 +1,48 @@
+# Cloudflare Pages redirect map — DTLM Architect
+#
+# Brief §9.2: "Build a redirect map from old URLs to new... Losing project and
+# press URLs means losing accumulated search ranking."
+#
+# STATUS: mostly empty, and that is currently correct.
+#
+# The client decided on 14 Aug 2026 to PRESERVE the existing WordPress URL
+# structure rather than move to the /projects/ paths proposed in brief §4:
+#
+#     /works/                    stays /works/
+#     /portfolio/[slug]/         stays /portfolio/[slug]/
+#     /project-type/[typology]/  stays /project-type/[typology]/
+#     /team/                     stays /team/
+#
+# Because those URLs do not change, they need no redirects. That decision was
+# taken partly to remove the risk created by an incomplete URL inventory — the
+# Phase 0 crawl could not enumerate 30 of the 34 project slugs, because the
+# existing site's robots.txt was returning HTTP 508.
+#
+# WHAT STILL NEEDS DOING BEFORE LAUNCH
+#
+# 1. The WordPress news archive at /category/updates/ (and its paginated pages)
+#    has no equivalent, because §5 Option 2 replaces the post archive with a
+#    single curated page. Every individual post URL under it needs a redirect.
+#    Those URLs are NOT yet known — see the Phase 0 audit.
+#
+# 2. Confirm every /portfolio/ slug in src/content/projects/*.md matches the
+#    live site exactly. A mismatched slug silently breaks an indexed URL.
+#
+# 3. Run a crawl of the live site immediately before cutover and diff it
+#    against the built site's sitemap. Anything in the first list and not the
+#    second needs a line here.
+
+# --- News archive -----------------------------------------------------------
+# The archive index and its pagination collapse onto the curated press page.
+/category/updates/            /news/   301
+/category/updates/page/*      /news/   301
+
+# --- Individual news posts --------------------------------------------------
+# TODO: one line per old post URL, e.g.
+#   /2025/08/pam-gold-medal/   /news/   301
+# Add these once the post URLs are recovered.
+
+# --- Catch-all for the old post structure -----------------------------------
+# Uncomment ONLY after confirming the old permalink structure. A wrong pattern
+# here can swallow valid URLs.
+# /:year/:month/:slug/         /news/   301

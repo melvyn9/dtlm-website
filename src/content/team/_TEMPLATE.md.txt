@@ -1,0 +1,35 @@
+---
+# ---------------------------------------------------------------------------
+# TEAM MEMBER TEMPLATE — copy this file, rename it to firstname-lastname.md,
+# and fill it in.
+#
+# The .md.txt extension keeps this template out of the build. Your copy must
+# end in .md
+# ---------------------------------------------------------------------------
+
+name: # REQUIRED. Full name with title. e.g. Ar. Dr. Tan Loke Mun
+
+role: # REQUIRED. e.g. Principal, Senior Architect, Project Architect
+
+order: 99
+  # Lower numbers appear first. The principal should be 1.
+
+headshot: ../../assets/team/firstname-lastname.jpg
+  # Optional. Delete this line if there is no photograph.
+  # Square crop works best. Max 1200px, under 500KB.
+
+headshotAlt: >-
+  # REQUIRED if a headshot is present — the build will fail without it.
+  # e.g. Portrait of Ar. Dr. Tan Loke Mun in the studio
+
+credentials: []
+  # Optional. e.g.
+  # - PAM Gold Medal 2025
+  # - PhD, Universiti Malaya
+
+draft: true
+  # true = visible when previewing locally, EXCLUDED from the live site.
+---
+
+Write the biography here, in Markdown. Two or three short paragraphs is
+usually right.

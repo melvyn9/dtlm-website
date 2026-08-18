@@ -1,0 +1,142 @@
+---
+/**
+ * Typology filter, rendered as a real URL route at build time.
+ *
+ * Brief §4: "if filtering by typology is wanted, implement as real URL routes
+ * rendered at build time... A client-side filter leaves an empty grid when JS
+ * is off."
+ *
+ * The path /project-type/[typology]/ matches the existing WordPress taxonomy
+ * URLs, so those stay valid too.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import DraftNotice from '../../components/DraftNotice.astro';
+import { getProjects } from '../../lib/content';
+import { TYPOLOGIES } from '../../consts.js';
+import t from '../../i18n/en.js';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return TYPOLOGIES.map((typology) => ({
+    params: { typology },
+    props: {
+      typology,
+      projects: projects.filter((p) => p.data.typology === typology),
+    },
+  }));
+}
+
+const { typology, projects } = Astro.props;
+const label = t[`typology.${typology}`];
+const draftCount = projects.filter((p) => p.data.draft).length;
+const used = new Set((await getProjects()).map((p) => p.data.typology));
+const filters = TYPOLOGIES.filter((ty) => used.has(ty));
+---
+
+<BaseLayout title={`${label} projects`} description={`${label} architectural projects by DTLM Architect.`}>
+  <DraftNotice count={draftCount} />
+
+  <div class="wrap section">
+    <header class="page-head">
+      <h1>{label}</h1>
+      <p class="meta">{t['works.count'](projects.length)}</p>
+    </header>
+
+    <nav class="filters" aria-label={t['works.filterLabel']}>
+      <ul>
+        <li><a href={withBase('/works/')}>{t['works.filterAll']}</a></li>
+        {
+          filters.map((ty) => (
+            <li>
+              <a
+                href={withBase(`/project-type/${ty}/`)}
+                aria-current={ty === typology ? 'page' : undefined}
+              >
+                {t[`typology.${ty}`]}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    {
+      projects.length > 0 ? (
+        <ul class="grid">
+          {projects.map((project, i) => (
+            <li>
+              <ProjectCard
+                href={withBase(`/portfolio/${project.data.slug}/`)}
+                title={project.data.title}
+                location={project.data.location}
+                year={project.data.year}
+                typology={project.data.typology}
+                heroImage={project.data.heroImage}
+                heroImageAlt={project.data.heroImageAlt}
+                priority={i === 0}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">
+          No {label.toLowerCase()} projects are published yet.
+          <a href={withBase('/works/')}>View all works</a>.
+        </p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-m);
+    margin-block-end: var(--space-l);
+  }
+
+  .filters ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-m);
+    padding-block-end: var(--space-m);
+    margin-block-end: var(--space-xl);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .filters a {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    color: var(--ink-muted);
+    display: inline-block;
+    padding-block: var(--space-3xs);
+    border-block-end: 1px solid transparent;
+  }
+
+  .filters a:hover,
+  .filters a[aria-current='page'] {
+    color: var(--ink);
+    border-block-end-color: var(--ink);
+  }
+
+  .grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-xl) var(--space-m);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .empty {
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+</style>

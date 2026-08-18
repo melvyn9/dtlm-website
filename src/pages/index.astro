@@ -1,0 +1,178 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import DraftNotice from '../components/DraftNotice.astro';
+import { getFeaturedProjects, getPress, formatPressDate } from '../lib/content';
+import { SITE } from '../consts.js';
+import t from '../i18n/en.js';
+import { withBase } from '../lib/url';
+
+const featured = await getFeaturedProjects(6);
+const press = (await getPress()).filter((p) => p.data.featured).slice(0, 3);
+const draftCount = featured.filter((p) => p.data.draft).length;
+---
+
+<BaseLayout title={`${SITE.name} — ${SITE.tagline}`} bareTitle>
+  <DraftNotice count={draftCount} />
+
+  <div class="wrap">
+    <section class="intro section">
+      <h1 class="intro__statement">
+        An architectural practice in Kuala Lumpur, working across houses, civic
+        buildings and interiors.
+      </h1>
+      <p class="intro__lede">
+        Led by {SITE.principal}, recipient of the PAM Gold Medal 2025.
+      </p>
+    </section>
+
+    {
+      featured.length > 0 && (
+        <section class="section--tight" aria-labelledby="selected-works">
+          <div class="section-head">
+            <h2 id="selected-works">{t['home.selected']}</h2>
+            <a href={withBase('/works/')}>{t['home.viewAll']}</a>
+          </div>
+
+          <ul class="grid">
+            {featured.map((project, i) => (
+              <li>
+                <ProjectCard
+                  href={withBase(`/portfolio/${project.data.slug}/`)}
+                  title={project.data.title}
+                  location={project.data.location}
+                  year={project.data.year}
+                  typology={project.data.typology}
+                  heroImage={project.data.heroImage}
+                  heroImageAlt={project.data.heroImageAlt}
+                  priority={i === 0}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      featured.length === 0 && (
+        <section class="section--tight">
+          <p class="empty">
+            No projects are published yet. Projects appear here once their
+            content is complete and image rights are confirmed.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      press.length > 0 && (
+        <section class="section--tight" aria-labelledby="recent">
+          <div class="section-head">
+            <h2 id="recent">{t['home.recent']}</h2>
+            <a href={withBase('/news/')}>{t['home.viewAllPress']}</a>
+          </div>
+
+          <ul class="press-list">
+            {press.map((item) => {
+              const date = formatPressDate(item);
+              return (
+                <li>
+                  <span class="press-list__source">{item.data.source}</span>
+                  <span class="press-list__title">
+                    {item.data.url ? (
+                      <a href={item.data.url} rel="noopener external">
+                        {item.data.title}
+                      </a>
+                    ) : (
+                      item.data.title
+                    )}
+                  </span>
+                  {date && <span class="press-list__date">{date}</span>}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .intro {
+    max-width: 40ch;
+  }
+
+  .intro__statement {
+    font-size: var(--step-3);
+  }
+
+  .intro__lede {
+    margin-block-start: var(--space-m);
+    color: var(--ink-muted);
+    font-size: var(--step-1);
+    max-width: var(--measure);
+  }
+
+  .section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding-block-end: var(--space-m);
+    margin-block-end: var(--space-l);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .section-head a {
+    font-size: var(--step--1);
+  }
+
+  .grid {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-xl) var(--space-m);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .press-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+  }
+
+  .press-list li {
+    display: grid;
+    gap: var(--space-3xs) var(--space-m);
+    grid-template-columns: minmax(8rem, 12rem) 1fr auto;
+    padding-block: var(--space-s);
+    border-block-end: 1px solid var(--rule);
+    align-items: baseline;
+  }
+
+  @media (max-width: 45rem) {
+    .press-list li {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .press-list__source {
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .press-list__date {
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .empty {
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+</style>

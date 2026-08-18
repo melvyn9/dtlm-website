@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
+---
+
+<BaseLayout title="Thank you" description="Your enquiry has been sent.">
+  <div class="wrap section">
+    <div class="prose">
+      <h1>Thank you</h1>
+      <p>Your enquiry has been sent. We will be in touch.</p>
+      <p><a href={withBase('/')}>Return to the homepage</a></p>
+    </div>
+  </div>
+</BaseLayout>

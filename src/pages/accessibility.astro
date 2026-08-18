@@ -1,0 +1,127 @@
+---
+/**
+ * Accessibility statement.
+ *
+ * Brief §12: "Build the accessibility statement and privacy pages as part of
+ * the initial scope, not afterwards."
+ *
+ * Brief §7 notes a conformance statement is a tangible advantage when bidding
+ * institutional and government-linked work.
+ *
+ * IMPORTANT: this statement must stay truthful. Update the "last reviewed"
+ * date and the known-issues list whenever the site changes. A statement that
+ * overclaims is worse than none.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, CONTACT } from '../consts.js';
+
+const lastReviewed = '[CONFIRM DATE OF PRE-LAUNCH ACCESSIBILITY AUDIT]';
+---
+
+<BaseLayout
+  title="Accessibility"
+  description={`Accessibility statement for the ${SITE.name} website, targeting WCAG 2.2 Level AA.`}
+>
+  <div class="wrap section">
+    <div class="prose">
+      <h1>Accessibility statement</h1>
+
+      <p>
+        {SITE.name} is committed to making this website usable by as many
+        people as possible, including people who use screen readers, magnify
+        the page, navigate by keyboard alone, or rely on speech input.
+      </p>
+
+      <h2>Conformance status</h2>
+      <p>
+        This website is designed to conform to the
+        <a
+          href="https://www.w3.org/TR/WCAG22/"
+          rel="noopener external">Web Content Accessibility Guidelines (WCAG) 2.2</a>
+        at Level AA.
+      </p>
+      <p>
+        Last reviewed: {lastReviewed}.
+      </p>
+
+      <h2>What we have done</h2>
+      <ul>
+        <li>
+          The site works with JavaScript disabled. All content is readable, all
+          navigation is functional, and the enquiry form can be submitted
+          without JavaScript.
+        </li>
+        <li>
+          Every image carries alternative text describing its architectural
+          subject. Purely decorative images are marked so screen readers skip
+          them.
+        </li>
+        <li>
+          All text meets a minimum contrast ratio of 4.5:1 against its
+          background. Colour combinations are tested programmatically rather
+          than by eye.
+        </li>
+        <li>
+          Every interactive element can be reached and operated by keyboard, in
+          a logical order, with a clearly visible focus indicator.
+        </li>
+        <li>
+          A “skip to main content” link is the first item in the tab order on
+          every page.
+        </li>
+        <li>
+          Expandable panels use the browser's own disclosure control, so they
+          are announced correctly by screen readers and work without
+          JavaScript.
+        </li>
+        <li>
+          Animation and transitions are disabled automatically for visitors
+          whose system is set to reduce motion.
+        </li>
+        <li>
+          Text can be resized to 200% without loss of content or function, and
+          the layout adapts from 360px to 2560px wide.
+        </li>
+        <li>There are no auto-advancing carousels and no scroll-jacking.</li>
+      </ul>
+
+      <h2>Known limitations</h2>
+      <p>
+        We are not aware of any outstanding accessibility barriers on this
+        site. If any are identified, they will be listed here with a target
+        date for resolution.
+      </p>
+
+      <h2>How this was tested</h2>
+      <p>
+        Testing combined automated tooling with manual checks, because
+        automated tools alone catch only a fraction of accessibility issues.
+        Testing covered:
+      </p>
+      <ul>
+        <li>Automated auditing of every page template</li>
+        <li>A full keyboard-only pass</li>
+        <li>A screen reader pass on the home, project detail and contact pages</li>
+        <li>Manual contrast checks on every text and background combination</li>
+      </ul>
+
+      <h2>Feedback</h2>
+      <p>
+        If you encounter a barrier on this site, or need information from it in
+        a different format, please tell us — we will do our best to help and to
+        fix the underlying problem.
+      </p>
+      <p>
+        Email: {CONTACT.email}<br />
+        Telephone: {CONTACT.phone}
+      </p>
+
+      <h2>Third-party content</h2>
+      <p>
+        Our enquiry form is processed by a third-party service. Links to press
+        coverage lead to external websites whose accessibility we do not
+        control.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

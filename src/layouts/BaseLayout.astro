@@ -1,0 +1,79 @@
+---
+/**
+ * Base layout — every page renders through this.
+ *
+ * Accessibility guarantees provided here so no individual page can forget
+ * them (brief §7):
+ *   - lang="en" on <html>
+ *   - skip link to main content, first in the tab order
+ *   - semantic landmarks: <header>, <nav>, <main>, <footer>
+ *   - exactly one <h1> per page, owned by the page not the layout
+ *   - meaningful <title> and meta description
+ */
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { SITE } from '../consts.js';
+import t from '../i18n/en.js';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Set true on the homepage only, where the site name leads the title. */
+  bareTitle?: boolean;
+  ogImage?: string;
+}
+
+const { title, description = SITE.description, bareTitle = false, ogImage } = Astro.props;
+
+const pageTitle = bareTitle ? title : `${title} — ${SITE.name}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:site_name" content={SITE.name} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, SITE.url).href} />}
+
+    <meta name="generator" content={Astro.generator} />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+  </head>
+
+  <body>
+    <!-- Skip link must be the first focusable element on the page (§7). -->
+    <a class="skip-link" href="#main">{t['nav.skip']}</a>
+
+    <SiteHeader />
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  /*
+   * tabindex="-1" makes <main> a valid target for the skip link without
+   * putting it in the tab order. The outline is suppressed because the
+   * user did not focus it directly — the link they activated is the
+   * visible affordance.
+   */
+  main:focus {
+    outline: none;
+  }
+</style>

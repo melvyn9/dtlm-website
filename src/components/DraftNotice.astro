@@ -1,0 +1,35 @@
+---
+/**
+ * Preview-only banner.
+ *
+ * Renders only in `npm run dev`. Its job is to make it impossible to mistake
+ * a local preview containing draft content for the live site.
+ */
+import { isPreview } from '../lib/content';
+
+interface Props {
+  count?: number;
+}
+const { count } = Astro.props;
+---
+
+{
+  isPreview && (
+    <div class="draft-notice" role="status">
+      <div class="wrap">
+        <strong>Local preview.</strong> Draft content is visible here and is excluded from the
+        live site.
+        {count !== undefined && ` ${count} item${count === 1 ? '' : 's'} on this page ${count === 1 ? 'is' : 'are'} still in draft.`}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .draft-notice {
+    background: #3d2f00;
+    color: #fff8e1;
+    font-size: var(--step--1);
+    padding-block: var(--space-2xs);
+  }
+</style>

@@ -1,0 +1,272 @@
+---
+/**
+ * Project detail page.
+ *
+ * URL is /portfolio/[slug]/ — matching the existing WordPress structure, per
+ * the client's decision to preserve project URLs.
+ *
+ * Brief §4 requires the detail panel to use the native <details>/<summary>
+ * element: it expands and collapses with zero JavaScript, is keyboard
+ * operable, and is announced correctly by screen readers without any ARIA.
+ * Do not replace this with a custom accordion.
+ */
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DraftNotice from '../../components/DraftNotice.astro';
+import { getProjects } from '../../lib/content';
+import { render } from 'astro:content';
+import t from '../../i18n/en.js';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({
+    params: { slug: project.data.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+
+const details = [
+  { label: t['project.year'], value: String(d.year) },
+  { label: t['project.location'], value: d.location },
+  { label: t['project.status'], value: t[`status.${d.status}`] },
+  { label: t['project.typology'], value: t[`typology.${d.typology}`] },
+  d.area ? { label: t['project.area'], value: `${d.area} m²` } : null,
+  d.client ? { label: t['project.client'], value: d.client } : null,
+  { label: t['project.photography'], value: d.photographer },
+].filter(Boolean) as { label: string; value: string }[];
+---
+
+<BaseLayout title={d.title} description={d.description}>
+  <DraftNotice count={d.draft ? 1 : 0} />
+
+  <article>
+    <!--
+      Hero image. Text is NOT overlaid on it: brief §7 notes hero overlays
+      routinely fail contrast. The title sits in a solid block beneath.
+    -->
+    <div class="hero">
+      <Image
+        src={d.heroImage}
+        alt={d.heroImageAlt}
+        widths={[600, 1000, 1600, 2200]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        format="avif"
+      />
+    </div>
+
+    <div class="wrap">
+      <header class="project-head">
+        <h1>{d.title}</h1>
+        <p class="project-head__meta">
+          {d.location} <span aria-hidden="true">·</span> {d.year}
+        </p>
+      </header>
+
+      <div class="project-body">
+        <div class="prose">
+          <Content />
+        </div>
+
+        <!-- Native disclosure widget — zero JavaScript (§4). -->
+        <details class="details" name="project-panel">
+          <summary>
+            <span>{t['project.details']}</span>
+          </summary>
+
+          <div class="details__content">
+            <dl class="spec">
+              {
+                details.map((row) => (
+                  <div class="spec__row">
+                    <dt>{row.label}</dt>
+                    <dd>{row.value}</dd>
+                  </div>
+                ))
+              }
+            </dl>
+
+            {
+              d.team.length > 0 && (
+                <section class="details__section">
+                  <h2>{t['project.team']}</h2>
+                  <ul>{d.team.map((m) => <li>{m}</li>)}</ul>
+                </section>
+              )
+            }
+
+            {
+              d.consultants.length > 0 && (
+                <section class="details__section">
+                  <h2>{t['project.consultants']}</h2>
+                  <ul>{d.consultants.map((c) => <li>{c}</li>)}</ul>
+                </section>
+              )
+            }
+
+            {
+              d.awards.length > 0 && (
+                <section class="details__section">
+                  <h2>{t['project.awards']}</h2>
+                  <ul>{d.awards.map((a) => <li>{a}</li>)}</ul>
+                </section>
+              )
+            }
+
+            {
+              d.publications.length > 0 && (
+                <section class="details__section">
+                  <h2>{t['project.publications']}</h2>
+                  <ul>
+                    {d.publications.map((p) => (
+                      <li>
+                        {p.url ? (
+                          <a href={p.url} rel="noopener external">
+                            {p.title}
+                          </a>
+                        ) : (
+                          p.title
+                        )}
+                        {p.publisher && <span class="meta"> — {p.publisher}</span>}
+                        {p.date && <span class="meta"> ({p.date})</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )
+            }
+          </div>
+        </details>
+
+        <p class="back">
+          <a href={withBase('/works/')}>{t['project.back']}</a>
+        </p>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .hero {
+    background: var(--paper-sunk);
+    aspect-ratio: 16 / 9;
+    max-height: 80vh;
+    overflow: hidden;
+  }
+
+  .hero :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project-head {
+    padding-block: var(--space-xl) var(--space-l);
+    max-width: var(--measure);
+  }
+
+  .project-head__meta {
+    margin-block-start: var(--space-s);
+    color: var(--ink-faint);
+    font-size: var(--step-0);
+  }
+
+  .project-body {
+    padding-block-end: var(--space-2xl);
+  }
+
+  .details {
+    margin-block-start: var(--space-xl);
+    border-block-start: 1px solid var(--rule);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .details summary {
+    /* Style the native marker, do not rebuild the control (§4). */
+    cursor: pointer;
+    list-style: none;
+    padding-block: var(--space-m);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+  }
+
+  .details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details summary::after {
+    content: '+';
+    font-size: var(--step-1);
+    line-height: 1;
+    color: var(--ink-faint);
+  }
+
+  .details[open] summary::after {
+    content: '\2212'; /* minus sign */
+  }
+
+  .details summary:hover {
+    color: var(--ink);
+  }
+
+  .details__content {
+    padding-block-end: var(--space-l);
+    display: grid;
+    gap: var(--space-l);
+    max-width: var(--measure);
+  }
+
+  .spec {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .spec__row {
+    display: grid;
+    grid-template-columns: minmax(7rem, 10rem) 1fr;
+    gap: var(--space-s);
+    padding-block: var(--space-2xs);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .spec dt {
+    color: var(--ink-faint);
+    font-size: var(--step--1);
+  }
+
+  .spec dd {
+    margin: 0;
+  }
+
+  .details__section h2 {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-block-end: var(--space-2xs);
+  }
+
+  .details__section ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3xs);
+  }
+
+  .back {
+    margin-block-start: var(--space-xl);
+    font-size: var(--step--1);
+  }
+</style>

@@ -1,0 +1,90 @@
+---
+# ---------------------------------------------------------------------------
+# PROJECT TEMPLATE — copy this file, rename it to your-project-slug.md, and
+# fill it in. Delete these comments as you go.
+#
+# The .md.txt extension keeps this template out of the build. Your copy must
+# end in .md
+#
+# Fields marked REQUIRED will fail the build if missing or left as a
+# placeholder. That is deliberate (brief §6).
+# ---------------------------------------------------------------------------
+
+title: # REQUIRED. The project name as it should appear. e.g. Verandah House
+
+slug: # REQUIRED. Lowercase, hyphens, no spaces. e.g. verandah-house
+      # This becomes the URL: /portfolio/verandah-house/
+      # If the project already exists on the old site, USE THE SAME SLUG —
+      # changing it breaks an indexed URL.
+
+year: # REQUIRED. Four digits, no quotes. e.g. 2024
+
+location: # REQUIRED. City, country. e.g. Kuala Lumpur, Malaysia
+
+client: # Optional. CHECK CONFIDENTIALITY before naming a client.
+
+status: # REQUIRED. One of: built | under-construction | competition | unbuilt
+
+typology: # REQUIRED. One of: residential | commercial | civic | institutional | interior
+
+area: # Optional. Square metres, number only, no units. e.g. 450
+
+description: >-
+  # REQUIRED. One or two sentences. Used on project cards and as the page's
+  # search-result summary. Write it for someone who has not seen the building.
+
+heroImage: ../../assets/projects/your-project-slug.jpg
+  # REQUIRED. Path to the image file you added to src/assets/projects/
+  # Max 2500px on the long edge, under 2MB. See the README for image prep.
+
+heroImageAlt: >-
+  # REQUIRED. Describe the architectural subject — what is actually in the
+  # frame. Do NOT repeat the project title; the build will reject that.
+  # Do NOT start with "image of" or "photo of".
+  # See the README for three worked examples.
+
+photographer: # REQUIRED. Name of the photographer or studio.
+              # Use "In-house" if the practice shot it.
+              # This is contractual — see the README.
+
+imageRightsConfirmed: false
+  # REQUIRED to be true before publishing. Set to true only once you have
+  # confirmed the practice holds web usage rights for this image and that the
+  # credit line matches the licence.
+
+awards: []
+  # Optional. e.g.
+  # - PAM Award 2025 — Gold
+  # - ARCASIA Awards for Architecture 2025 — Honorary Mention
+
+publications: []
+  # Optional. e.g.
+  # - title: Kemaris House featured in Tatler Asia
+  #   publisher: Tatler Asia
+  #   date: March 2024
+  #   url: https://www.tatlerasia.com/...
+
+team: []
+  # Optional. e.g.
+  # - Ar. Dr. Tan Loke Mun
+
+consultants: []
+  # Optional. e.g.
+  # - Structural: [firm name]
+
+featured: false
+  # true = show on the homepage.
+
+order: 999
+  # Lower numbers sort first on the works index.
+
+draft: true
+  # true = visible when previewing locally, EXCLUDED from the live site.
+  # Set to false only when everything above is complete and confirmed.
+---
+
+Write the main project text here, in Markdown.
+
+Blank line between paragraphs. Use ## for subheadings if the text is long
+enough to need them — do not use # , the project title is already the page's
+only H1.

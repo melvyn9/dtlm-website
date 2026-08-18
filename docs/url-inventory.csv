@@ -1,0 +1,54 @@
+url_path,page_type,title,status,slug_confirmed,notes
+/,home,DRTANLM ARCHITECT – creating places for people,confirmed,yes,"Hero + latest projects + gallery + recent posts"
+/works/,project_index,Works – DRTANLM ARCHITECT,confirmed,yes,"Lists 34 projects. Maps to /projects/ in new structure"
+/team/,team,Team – DRTANLM ARCHITECT,confirmed_via_search,yes,"Page exists per search index; direct fetch blocked by robots.txt 508"
+/portfolio/clay-roof-house/,project_detail,Clay Roof House,confirmed,yes,"ARCASIA 2025 Honorary Mention per brief - award NOT listed on page itself"
+/portfolio/s11-house/,project_detail,S11 House,confirmed_via_search,yes,
+/portfolio/urmu/,project_detail,URMU,confirmed_via_search,yes,
+/portfolio/n-by-ur-mu/,project_detail,+n by Ur-Mu,confirmed_via_search,yes,
+/project-type/interior-design/,taxonomy,Interior Design,confirmed_via_search,yes,"Typology taxonomy - maps to brief section 4 filter routes"
+/project-type/public-institutional/,taxonomy,Public & Institutional,confirmed_via_search,yes,
+/category/updates/,news_index,Updates,confirmed,yes,"News/press archive index"
+/category/updates/page/2/,news_index,Updates – Page 2,confirmed_via_search,yes,"Pagination confirmed - at least 2 pages exist"
+UNKNOWN,project_detail,No.18 House,slug_unknown,no,"Listed on /works/ - exact /portfolio/ slug not yet captured"
+UNKNOWN,project_detail,Verandah House,slug_unknown,no,
+UNKNOWN,project_detail,University Malaya Masterplan,slug_unknown,no,
+UNKNOWN,project_detail,PJKita Road Mural,slug_unknown,no,
+UNKNOWN,project_detail,TAR University College,slug_unknown,no,
+UNKNOWN,project_detail,House 12H,slug_unknown,no,"Kuala Lumpur, Malaysia"
+UNKNOWN,project_detail,23 Terrace,slug_unknown,no,"Kuala Lumpur, Malaysia"
+UNKNOWN,project_detail,Almas,slug_unknown,no,"Puteri Harbour, Johor"
+UNKNOWN,project_detail,British India Store,slug_unknown,no,"Sunway Pyramid, Selangor"
+UNKNOWN,project_detail,District 7,slug_unknown,no,"Ho Chi Minh City, Vietnam"
+UNKNOWN,project_detail,M Marini,slug_unknown,no,"Kuala Lumpur, Malaysia"
+UNKNOWN,project_detail,Mandalay City Convention Centre,slug_unknown,no,"Myanmar - integrated entertainment complex"
+UNKNOWN,project_detail,No. 19,slug_unknown,no,"Subang Jaya, Selangor"
+UNKNOWN,project_detail,Puchong Festival City,slug_unknown,no,
+UNKNOWN,project_detail,Suen Galleries,slug_unknown,no,"Bangsar, Kuala Lumpur"
+UNKNOWN,project_detail,The Metis,slug_unknown,no,"Iskandar Johor Bahru"
+UNKNOWN,project_detail,The Wood Box,slug_unknown,no,"Kuala Lumpur, Malaysia"
+UNKNOWN,project_detail,Fabric House,slug_unknown,no,
+UNKNOWN,project_detail,S14 House,slug_unknown,no,
+UNKNOWN,project_detail,Nomaps,slug_unknown,no,
+UNKNOWN,project_detail,Marina Park Pavilion,slug_unknown,no,
+UNKNOWN,project_detail,House No.100,slug_unknown,no,
+UNKNOWN,project_detail,House No. 16,slug_unknown,no,
+UNKNOWN,project_detail,EDL Gallery,slug_unknown,no,
+UNKNOWN,project_detail,House No. 47,slug_unknown,no,
+UNKNOWN,project_detail,Selindung Daun Daun Sales Gallery,slug_unknown,no,
+UNKNOWN,project_detail,House No. 36,slug_unknown,no,"Featured Architecture Malaysia Vol.36 Issue 1 2024"
+UNKNOWN,project_detail,PJKita Community Centre,slug_unknown,no,
+UNKNOWN,project_detail,Kemaris House,slug_unknown,no,"Featured in Tatler Asia and ArchDaily"
+UNKNOWN,project_detail,Glad Tidings Offices,slug_unknown,no,"Subject of 'A Divine Intervention' press piece"
+UNKNOWN,news_post,ARCASIA Awards for Architecture 2025,slug_unknown,no,"Award - Clay Roof House, Incheon South Korea"
+UNKNOWN,news_post,PAM Gold Medal 2025,slug_unknown,no,"Major award - The Star coverage 2025-08-23"
+UNKNOWN,news_post,A Divine Intervention | Glad Tidings Church Office,slug_unknown,no,
+UNKNOWN,news_post,Kemaris House featured in Tatler Asia,slug_unknown,no,
+UNKNOWN,news_post,Dr Tan Loke Mun featured in The Edge Options,slug_unknown,no,"Week of August 5-11 2024"
+UNKNOWN,news_post,Guest Speaker The Property Show on BFM,slug_unknown,no,"2024-07-17"
+UNKNOWN,news_post,DRTAN LM Architect featured in Architizer,slug_unknown,no,"15 Architecture Firms in Malaysia"
+UNKNOWN,news_post,Next Asia II: Innovations in Tropical,slug_unknown,no,
+UNKNOWN,news_post,The Essential Role of Art + Architecture,slug_unknown,no,"2024-05-09 - speaking engagement"
+UNKNOWN,news_post,House No. 36 Featured in Architecture Malaysia,slug_unknown,no,"Vol.36 Issue 1 2024"
+UNKNOWN,news_post,Kemaris House Featured in Archdaily,slug_unknown,no,
+UNKNOWN,news_post,Ur-Mu Featured in The Star Lifestyle Living,slug_unknown,no,

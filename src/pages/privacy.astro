@@ -1,0 +1,102 @@
+---
+/**
+ * Privacy notice.
+ *
+ * Brief §10: "required once the contact form is live; consider Malaysian PDPA
+ * obligations." Brief §12 puts it in initial scope.
+ *
+ * ---------------------------------------------------------------------------
+ * THIS IS A DRAFT AND IS NOT LEGAL ADVICE.
+ *
+ * It is written to be accurate about what the site actually does — a
+ * third-party form processor, cookieless analytics, no tracking — so that it
+ * is a sound starting point. It has NOT been reviewed against the Personal
+ * Data Protection Act 2010. Have the practice's legal adviser review it
+ * before launch, and fill in the bracketed items.
+ * ---------------------------------------------------------------------------
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, CONTACT } from '../consts.js';
+
+const lastUpdated = '[CONFIRM DATE]';
+---
+
+<BaseLayout
+  title="Privacy"
+  description={`How ${SITE.name} handles personal data submitted through this website.`}
+>
+  <div class="wrap section">
+    <div class="prose">
+      <h1>Privacy notice</h1>
+      <p class="meta">Last updated: {lastUpdated}</p>
+
+      <p>
+        This notice explains what happens to personal information you provide
+        through this website. It is issued by {SITE.legalName}
+        (“we”, “us”), of {CONTACT.addressLines.join(', ')}.
+      </p>
+
+      <h2>What we collect</h2>
+      <p>
+        The only personal information this website collects is what you type
+        into the enquiry form: your name, your email address, and the content
+        of your message. We do not ask for anything else, and the site does not
+        create an account for you.
+      </p>
+
+      <h2>Why we collect it</h2>
+      <p>
+        Solely to read and respond to your enquiry. We do not use it for
+        marketing, we do not build a profile from it, and we do not sell or
+        rent it to anyone.
+      </p>
+
+      <h2>How it reaches us</h2>
+      <p>
+        The enquiry form is processed by a third-party form service, which
+        receives your submission and forwards it to us by email. Your message
+        passes through that provider's systems in transit.
+      </p>
+      <p>
+        [CONFIRM: name the form provider, link to its privacy policy, and state
+        where it processes data — brief §3 requires confirming the endpoint's
+        data handling is acceptable before committing to it.]
+      </p>
+
+      <h2>How long we keep it</h2>
+      <p>
+        [CONFIRM RETENTION PERIOD — e.g. enquiry emails are retained for
+        24 months and then deleted.]
+      </p>
+
+      <h2>Cookies and analytics</h2>
+      <p>
+        This website does not set cookies. We use a privacy-preserving
+        analytics service that counts page views without cookies and without
+        collecting information capable of identifying you individually. This is
+        why you are not asked to accept a cookie banner.
+      </p>
+
+      <h2>Your rights</h2>
+      <p>
+        Under the Personal Data Protection Act 2010, you may ask us for a copy
+        of the personal data we hold about you, ask us to correct it if it is
+        inaccurate, or ask us to stop processing it. To make a request, contact
+        us using the details below.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Email: {CONTACT.email}<br />
+        Telephone: {CONTACT.phone}<br />
+        Post: {CONTACT.addressLines.join(', ')}
+      </p>
+
+      <h2>Changes to this notice</h2>
+      <p>
+        If we change how this website handles personal information, we will
+        update this page and change the date at the top.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,99 @@
+---
+import { SITE, CONTACT, FOOTER_NAV, NAV } from '../consts.js';
+import t from '../i18n/en.js';
+import { withBase } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <div class="site-footer__block">
+      <p class="site-footer__name">{SITE.name}</p>
+      <address class="site-footer__address">
+        {CONTACT.addressLines.map((line) => <span>{line}</span>)}
+      </address>
+    </div>
+
+    <nav class="site-footer__block" aria-label={t['nav.footer']}>
+      <ul>
+        {NAV.map((item) => <li><a href={withBase(item.href)}>{t[item.key]}</a></li>)}
+        {FOOTER_NAV.map((item) => <li><a href={withBase(item.href)}>{t[item.key]}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="site-footer__block site-footer__legal">
+      <p>&copy; {year} {SITE.legalName}. All rights reserved.</p>
+      <p class="site-footer__credit">
+        Photography remains the copyright of the credited photographers.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--ink);
+    color: var(--paper);
+    margin-block-start: var(--space-2xl);
+    padding-block: var(--space-xl);
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: var(--space-l);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+
+  .site-footer__name {
+    font-size: var(--step-0);
+    letter-spacing: 0.04em;
+    margin-block-end: var(--space-2xs);
+  }
+
+  .site-footer__address {
+    font-style: normal;
+    font-size: var(--step--1);
+    line-height: 1.7;
+  }
+
+  .site-footer__address span {
+    display: block;
+  }
+
+  .site-footer__block ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2xs);
+  }
+
+  .site-footer a {
+    /* Inverted: --paper on --ink is 17.5:1, comfortably AA (§7). */
+    color: var(--paper);
+    font-size: var(--step--1);
+    text-decoration-color: rgba(251, 251, 249, 0.4);
+    display: inline-block;
+    padding-block: var(--space-3xs);
+  }
+
+  .site-footer a:hover {
+    color: var(--paper);
+    text-decoration-color: var(--paper);
+  }
+
+  .site-footer :focus-visible {
+    outline-color: var(--paper);
+  }
+
+  .site-footer__legal {
+    font-size: var(--step--1);
+    display: grid;
+    gap: var(--space-2xs);
+    align-content: start;
+  }
+
+  .site-footer__credit {
+    color: rgba(251, 251, 249, 0.75);
+  }
+</style>
