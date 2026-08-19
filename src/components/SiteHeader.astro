@@ -350,13 +350,37 @@ import { withBase } from '../lib/url';
         display: none;
       }
 
+      /*
+       * `top` clears the header's own height, not `inset: 0`, deliberately.
+       * primary-nav is a *child* of .site-header (sibling of the brand and
+       * toggle, both siblings of the header's own background) — a child's
+       * painted content always layers above its own ancestor's background,
+       * regardless of z-index, because z-index only orders positioned
+       * *siblings* against each other. Giving primary-nav z-index:1 stacks
+       * it correctly below the brand/toggle (z-index:2, real siblings), but
+       * there is no z-index that makes a descendant paint *behind* its own
+       * ancestor's background — that relationship isn't something z-index
+       * can express. With `inset: 0`, primary-nav's box reached all the way
+       * to the top of the viewport, so once its own scrollable content (not
+       * the page — see the sticky-header comment above for that) was
+       * scrolled, links slid up and rendered on top of the sticky header's
+       * background, covering the brand name instead of being covered by it.
+       * Starting the box at `top` instead means the overlay's own
+       * `overflow-y: auto` clips that content at the header's lower edge —
+       * scrolled links disappear into the header-height gap rather than
+       * ever reaching the header's screen area, so there is nothing left to
+       * out-stack in the first place.
+       */
       .site-header:has(#site-nav[open]) .primary-nav {
         display: block;
         position: fixed;
-        inset: 0;
+        top: calc(var(--space-2xl) + var(--space-s));
+        right: 0;
+        bottom: 0;
+        left: 0;
         z-index: 1;
         background: var(--paper);
-        padding: calc(var(--space-2xl) + var(--space-s)) var(--gutter) var(--space-xl);
+        padding: var(--space-l) var(--gutter) var(--space-xl);
         overflow-y: auto;
         overscroll-behavior: contain;
         animation: nav-in 180ms ease;
