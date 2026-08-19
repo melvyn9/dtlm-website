@@ -13,7 +13,7 @@ import { Image } from 'astro:assets';
 import t from '../i18n/en.js';
 
 interface Props {
-  href: string;
+  slug: string;
   title: string;
   location: string;
   year: number;
@@ -24,7 +24,7 @@ interface Props {
   priority?: boolean;
 }
 
-const { href, title, location, year, typology, heroImage, heroImageAlt, priority = false } =
+const { slug, title, location, year, typology, heroImage, heroImageAlt, priority = false } =
   Astro.props;
 ---
 
@@ -43,7 +43,7 @@ const { href, title, location, year, typology, heroImage, heroImageAlt, priority
 
   <div class="card__body">
     <h3 class="card__title">
-      <a href={href}>{title}</a>
+      <button type="button" popovertarget={`project-${slug}`}>{title}</button>
     </h3>
     <p class="card__meta">
       <span>{location}</span>
@@ -90,25 +90,32 @@ const { href, title, location, year, typology, heroImage, heroImageAlt, priority
     letter-spacing: -0.01em;
   }
 
-  .card__title a {
+  .card__title button {
+    /* Reset button chrome — this is a trigger, styled to read as a title. */
+    border: 0;
+    background: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    text-align: left;
     color: var(--ink);
-    text-decoration: none;
+    cursor: pointer;
   }
 
-  /* Stretch the title link over the card so the whole card is clickable,
-     without creating a second redundant link for screen readers. */
-  .card__title a::after {
+  /* Stretch the trigger over the card so the whole card is clickable,
+     without creating a second redundant control for screen readers. */
+  .card__title button::after {
     content: '';
     position: absolute;
     inset: 0;
   }
 
-  .card__title a:hover {
+  .card__title button:hover {
     color: var(--accent);
   }
 
-  /* Because the link is stretched, focus must be shown on the whole card. */
-  .card:has(a:focus-visible) {
+  /* Because the trigger is stretched, focus must be shown on the whole card. */
+  .card:has(button:focus-visible) {
     outline: 3px solid var(--focus-ring);
     outline-offset: 6px;
   }

@@ -259,8 +259,12 @@ const press = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/press' }),
   schema: z.object({
     title: z.string().min(1),
-    /** Drives grouping on the /news/ page. */
-    kind: z.enum(['award', 'publication', 'speaking']),
+    /**
+     * Drives grouping on the homepage's press sections. `exhibition`,
+     * `museum` and `book` have no entries yet — those sections render an
+     * empty/coming-soon state until real content is added.
+     */
+    kind: z.enum(['award', 'publication', 'speaking', 'exhibition', 'museum', 'book']),
     /** Publication or awarding body. */
     source: z.string().min(1),
     /**

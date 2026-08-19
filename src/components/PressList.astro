@@ -1,0 +1,77 @@
+---
+/**
+ * Plain source / title(+external link) / date list.
+ *
+ * Presentational only — no heading, no landmark. Extracted so the same
+ * markup isn't copy-pasted into every press-driven homepage section
+ * (Awards, News, Speaking, Exhibitions, Art Museums, Books + Ideas).
+ */
+import { formatPressDate, type PressItem } from '../lib/content';
+import t from '../i18n/en.js';
+
+interface Props {
+  items: PressItem[];
+}
+const { items } = Astro.props;
+---
+
+<ul class="press-list">
+  {
+    items.map((item) => {
+      const date = formatPressDate(item);
+      return (
+        <li>
+          <span class="press-list__source">{item.data.source}</span>
+          <span class="press-list__title">
+            {item.data.url ? (
+              <a href={item.data.url} rel="noopener external" aria-label={`${item.data.title} — ${t['press.external']}`}>
+                {item.data.title}
+              </a>
+            ) : (
+              item.data.title
+            )}
+          </span>
+          <span class="press-list__date">{date ?? ''}</span>
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .press-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .press-list li {
+    display: grid;
+    gap: var(--space-3xs) var(--space-m);
+    grid-template-columns: minmax(9rem, 14rem) 1fr minmax(0, 12rem);
+    padding-block: var(--space-m);
+    border-block-end: 1px solid var(--rule);
+    align-items: baseline;
+  }
+
+  @media (max-width: 50rem) {
+    .press-list li {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .press-list__source {
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .press-list__title {
+    font-size: var(--step-0);
+  }
+
+  .press-list__date {
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+</style>

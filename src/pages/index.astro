@@ -1,20 +1,44 @@
 ---
+/**
+ * The one-page site.
+ *
+ * Every former standalone page (works, portfolio detail, project-type,
+ * about, team, news, contact) has been folded into an anchor section here.
+ * Nav bar items in consts.js point at `/#section-id` anchors rather than
+ * separate routes — see SiteHeader.astro / SiteFooter.astro.
+ *
+ * Project detail used to be its own page; it's now a same-DOM Popover-API
+ * panel (ProjectPopover.astro) opened by a <button popovertarget> in
+ * ProjectCard.astro. This is a native browser mechanism, not JavaScript —
+ * it works identically with JS on or off, and never changes the URL,
+ * matching the brief's zero-JS mandate the rest of this codebase holds to.
+ */
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import ProjectPopover from '../components/ProjectPopover.astro';
+import PressSection from '../components/PressSection.astro';
+import PressList from '../components/PressList.astro';
 import DraftNotice from '../components/DraftNotice.astro';
-import { getFeaturedProjects, getPress, getTeam, formatPressDate } from '../lib/content';
-import { SITE } from '../consts.js';
+import { getProjects, getFeaturedProjects, getPress, getTeam } from '../lib/content';
+import { CONTACT, FORM, SITE } from '../consts.js';
 import t from '../i18n/en.js';
 import { withBase } from '../lib/url';
 
+const allProjects = await getProjects();
 const featured = await getFeaturedProjects(6);
-const press = (await getPress()).filter((p) => p.data.featured).slice(0, 3);
-const draftCount = featured.filter((p) => p.data.draft).length;
+const press = await getPress();
+const draftCount =
+  allProjects.filter((p) => p.data.draft).length + press.filter((p) => p.data.draft).length;
 
-// Principal's headshot for the homepage hero. Falls back to a text-only
-// intro if the team entry or its photo isn't available yet.
 const principal = (await getTeam()).find((m) => m.data.name === SITE.principal);
+
+const awardItems = press.filter((p) => p.data.kind === 'award');
+const publicationItems = press.filter((p) => p.data.kind === 'publication');
+const speakingItems = press.filter((p) => p.data.kind === 'speaking');
+const exhibitionItems = press.filter((p) => p.data.kind === 'exhibition');
+const museumItems = press.filter((p) => p.data.kind === 'museum');
+const bookItems = press.filter((p) => p.data.kind === 'book');
 ---
 
 <BaseLayout title={`${SITE.name} — ${SITE.tagline}`} bareTitle>
@@ -48,78 +72,190 @@ const principal = (await getTeam()).find((m) => m.data.name === SITE.principal);
         )
       }
     </section>
-
-    {
-      featured.length > 0 && (
-        <section class="section--tight" aria-labelledby="selected-works">
-          <div class="section-head">
-            <h2 id="selected-works">{t['home.selected']}</h2>
-            <a href={withBase('/works/')}>{t['home.viewAll']}</a>
-          </div>
-
-          <ul class="grid">
-            {featured.map((project, i) => (
-              <li>
-                <ProjectCard
-                  href={withBase(`/portfolio/${project.data.slug}/`)}
-                  title={project.data.title}
-                  location={project.data.location}
-                  year={project.data.year}
-                  typology={project.data.typology}
-                  heroImage={project.data.heroImage}
-                  heroImageAlt={project.data.heroImageAlt}
-                  priority={i === 0}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    {
-      featured.length === 0 && (
-        <section class="section--tight">
-          <p class="empty">
-            No projects are published yet. Projects appear here once their
-            content is complete and image rights are confirmed.
-          </p>
-        </section>
-      )
-    }
-
-    {
-      press.length > 0 && (
-        <section class="section--tight" aria-labelledby="recent">
-          <div class="section-head">
-            <h2 id="recent">{t['home.recent']}</h2>
-            <a href={withBase('/news/')}>{t['home.viewAllPress']}</a>
-          </div>
-
-          <ul class="press-list">
-            {press.map((item) => {
-              const date = formatPressDate(item);
-              return (
-                <li>
-                  <span class="press-list__source">{item.data.source}</span>
-                  <span class="press-list__title">
-                    {item.data.url ? (
-                      <a href={item.data.url} rel="noopener external">
-                        {item.data.title}
-                      </a>
-                    ) : (
-                      item.data.title
-                    )}
-                  </span>
-                  {date && <span class="press-list__date">{date}</span>}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )
-    }
   </div>
+
+  {
+    featured.length > 0 && (
+      <section id="selected-works" class="wrap section--tight" aria-labelledby="selected-works-heading">
+        <h2 id="selected-works-heading">{t['home.selected']}</h2>
+        <ul class="grid">
+          {featured.map((project, i) => (
+            <li>
+              <ProjectCard
+                slug={project.data.slug}
+                title={project.data.title}
+                location={project.data.location}
+                year={project.data.year}
+                typology={project.data.typology}
+                heroImage={project.data.heroImage}
+                heroImageAlt={project.data.heroImageAlt}
+                priority={i === 0}
+              />
+            </li>
+          ))}
+        </ul>
+        {featured.map((project) => <ProjectPopover project={project} />)}
+      </section>
+    )
+  }
+
+  {
+    featured.length === 0 && (
+      <section id="selected-works" class="wrap section--tight" aria-labelledby="selected-works-heading">
+        <h2 id="selected-works-heading">{t['home.selected']}</h2>
+        <p class="empty">
+          No projects are published yet. Projects appear here once their
+          content is complete and image rights are confirmed.
+        </p>
+      </section>
+    )
+  }
+
+  <PressSection id="awards" heading={t['press.awards']} items={awardItems} />
+
+  <PressSection id="news" heading={t['press.title']} items={publicationItems}>
+    {
+      speakingItems.length > 0 && (
+        <div class="press-subgroup">
+          <h3>{t['press.speaking']}</h3>
+          <PressList items={speakingItems} />
+        </div>
+      )
+    }
+  </PressSection>
+
+  <PressSection id="exhibitions" heading={t['press.exhibitions']} items={exhibitionItems} />
+  <PressSection id="museums" heading={t['press.museums']} items={museumItems} />
+  <PressSection id="books" heading={t['press.books']} items={bookItems} />
+
+  <section id="contact" class="wrap section--tight" aria-labelledby="contact-heading">
+    <h2 id="contact-heading">{t['contact.title']}</h2>
+
+    {
+      (!CONTACT.verified || !FORM.configured) && import.meta.env.DEV && (
+        <div class="setup-notice" role="status">
+          <strong>Setup incomplete.</strong>
+          {!CONTACT.verified && ' Contact details are placeholders — confirm them in src/consts.js.'}
+          {!FORM.configured && ' The form endpoint has no access key yet — see src/consts.js.'}
+        </div>
+      )
+    }
+
+    <div class="contact-layout">
+      <section class="details" aria-labelledby="contact-details">
+        <h3 id="contact-details" class="visually-hidden">Contact details</h3>
+
+        <dl>
+          <div>
+            <dt>{t['contact.address']}</dt>
+            <dd>
+              <address>
+                {CONTACT.addressLines.map((line) => <span>{line}</span>)}
+              </address>
+            </dd>
+          </div>
+
+          <div>
+            <dt>{t['contact.phone']}</dt>
+            <dd>
+              {
+                CONTACT.phoneHref ? (
+                  <a href={`tel:${CONTACT.phoneHref}`}>{CONTACT.phone}</a>
+                ) : (
+                  CONTACT.phone
+                )
+              }
+            </dd>
+          </div>
+
+          <div>
+            <dt>{t['contact.emailLabel']}</dt>
+            <dd>
+              {
+                CONTACT.email.startsWith('[') ? (
+                  CONTACT.email
+                ) : (
+                  <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+                )
+              }
+            </dd>
+          </div>
+        </dl>
+
+        <p class="map">
+          <a href={CONTACT.mapLink} rel="noopener external">{t['contact.viewMap']}</a>
+        </p>
+      </section>
+
+      <section class="form-section" aria-labelledby="enquiry">
+        <h3 id="enquiry">{t['contact.formTitle']}</h3>
+
+        <!--
+          Plain HTML form POST. No JavaScript involved at any point (§2.1).
+          Web3Forms redirects the browser to `redirect` on success, so the
+          non-JS flow ends on a real page rather than a JSON response.
+        -->
+        <form action={FORM.endpoint} method="POST" class="form">
+          <input type="hidden" name="access_key" value={FORM.accessKey} />
+          <input type="hidden" name="redirect" value={FORM.redirectTo} />
+          <input type="hidden" name="subject" value={`Website enquiry — ${SITE.name}`} />
+          <input type="hidden" name="from_name" value={SITE.name} />
+
+          <!--
+            Honeypot (§3). Hidden from sighted users AND from screen readers
+            via aria-hidden + tabindex, so it never traps a real person.
+          -->
+          <div class="honeypot" aria-hidden="true">
+            <label for={FORM.honeypotField}>Leave this field empty</label>
+            <input
+              type="checkbox"
+              id={FORM.honeypotField}
+              name={FORM.honeypotField}
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </div>
+
+          <p class="form__hint" id="required-hint">
+            Fields marked <abbr title="required">*</abbr> are required.
+          </p>
+
+          <div class="field">
+            <label for="name">
+              {t['contact.name']} <abbr title="required" aria-hidden="true">*</abbr>
+            </label>
+            <input type="text" id="name" name="name" required autocomplete="name" />
+          </div>
+
+          <div class="field">
+            <label for="email">
+              {t['contact.email']} <abbr title="required" aria-hidden="true">*</abbr>
+            </label>
+            <input type="email" id="email" name="email" required autocomplete="email" />
+          </div>
+
+          <div class="field">
+            <label for="enquiry-subject">{t['contact.subject']}</label>
+            <input type="text" id="enquiry-subject" name="enquiry_subject" />
+          </div>
+
+          <div class="field">
+            <label for="message">
+              {t['contact.message']} <abbr title="required" aria-hidden="true">*</abbr>
+            </label>
+            <textarea id="message" name="message" rows="7" required></textarea>
+          </div>
+
+          <button type="submit">{t['contact.submit']}</button>
+
+          <p class="form__privacy">
+            Your details are sent to the practice by email and are not used for
+            anything else. See our <a href={withBase('/privacy/')}>privacy notice</a>.
+          </p>
+        </form>
+      </section>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
@@ -170,21 +306,6 @@ const principal = (await getTeam()).find((m) => m.data.name === SITE.principal);
     object-fit: cover;
   }
 
-  .section-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-s);
-    padding-block-end: var(--space-m);
-    margin-block-end: var(--space-l);
-    border-block-end: 1px solid var(--rule);
-  }
-
-  .section-head a {
-    font-size: var(--step--1);
-  }
-
   .grid {
     list-style: none;
     padding: 0;
@@ -193,41 +314,154 @@ const principal = (await getTeam()).find((m) => m.data.name === SITE.principal);
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
   }
 
-  .press-list {
-    list-style: none;
-    padding: 0;
-    display: grid;
-  }
-
-  .press-list li {
-    display: grid;
-    gap: var(--space-3xs) var(--space-m);
-    grid-template-columns: minmax(8rem, 12rem) 1fr auto;
-    padding-block: var(--space-s);
+  #selected-works > h2 {
+    padding-block-end: var(--space-m);
+    margin-block-end: var(--space-l);
     border-block-end: 1px solid var(--rule);
-    align-items: baseline;
-  }
-
-  @media (max-width: 45rem) {
-    .press-list li {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .press-list__source {
-    font-size: var(--step--1);
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .press-list__date {
-    font-size: var(--step--1);
-    color: var(--ink-faint);
   }
 
   .empty {
     color: var(--ink-muted);
     max-width: var(--measure);
+  }
+
+  .press-subgroup {
+    margin-block-start: var(--space-l);
+  }
+
+  .press-subgroup h3 {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    padding-block-end: var(--space-s);
+    border-block-end: 1px solid var(--ink);
+  }
+
+  #contact > h2 {
+    padding-block-end: var(--space-m);
+    margin-block-end: var(--space-l);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .setup-notice {
+    background: #3d2f00;
+    color: #fff8e1;
+    font-size: var(--step--1);
+    padding: var(--space-2xs) var(--space-m);
+    margin-block-end: var(--space-l);
+  }
+
+  .contact-layout {
+    display: grid;
+    gap: var(--space-2xl) var(--space-xl);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    align-items: start;
+  }
+
+  dl {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  dt {
+    font-size: var(--step--1);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    margin-block-end: var(--space-3xs);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  address span {
+    display: block;
+  }
+
+  .map {
+    margin-block-start: var(--space-l);
+    font-size: var(--step--1);
+  }
+
+  .form-section h3 {
+    font-size: var(--step-1);
+    margin-block-end: var(--space-m);
+  }
+
+  .form {
+    display: grid;
+    gap: var(--space-m);
+    max-width: 34rem;
+  }
+
+  .form__hint {
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  .field {
+    display: grid;
+    gap: var(--space-3xs);
+  }
+
+  label {
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  input[type='text'],
+  input[type='email'],
+  textarea {
+    border: 1px solid var(--ink-faint);
+    background: var(--paper);
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: 0;
+    font-size: max(1rem, var(--step-0));
+    min-height: 2.75rem;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  abbr {
+    text-decoration: none;
+    color: var(--accent);
+  }
+
+  button[type='submit'] {
+    background: var(--accent);
+    color: var(--paper);
+    border: 0;
+    padding: var(--space-xs) var(--space-l);
+    font-size: var(--step-0);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    justify-self: start;
+    min-height: 2.75rem;
+    transition: background var(--transition);
+  }
+
+  button[type='submit']:hover {
+    background: var(--accent-hover);
+  }
+
+  .form__privacy {
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
   }
 </style>

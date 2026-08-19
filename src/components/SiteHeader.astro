@@ -33,9 +33,34 @@
  * FOCUS CONTAINMENT WITHOUT A JAVASCRIPT FOCUS TRAP
  *
  * WCAG 2.2 SC 2.4.11 (Focus Not Obscured) is satisfied by setting <main> and
- * <footer> to display:none while the overlay is open, which removes everything
- * behind it from the tab order. A full-screen menu hides that content visually
- * anyway, so this matches what the user sees.
+ * <footer> to visibility:hidden while the overlay is open, which removes
+ * everything behind it from the tab order and the accessibility tree. A
+ * full-screen menu hides that content visually anyway, so this matches what
+ * the user sees.
+ *
+ * visibility:hidden, not display:none — deliberately. Every NAV link is now a
+ * same-page `/#id` anchor rather than a separate route, so tapping one while
+ * the overlay is open is a same-document fragment navigation: the browser
+ * tries to scroll to the target immediately, and it never retries later.
+ * display:none would remove <main>'s layout box at that exact moment, so the
+ * target section has nowhere to scroll to and the scroll silently fails —
+ * closing the overlay afterwards does not fix it, the page is left wherever
+ * it was. visibility:hidden keeps the layout box (so the scroll still lands
+ * correctly) while still excluding the content from the tab order.
+ *
+ * That fragment scroll happens immediately, while the overlay is still open —
+ * <details> only ever closes via its own <summary>, an anchor click can't
+ * close it. `.primary-nav` is position:fixed, so it keeps covering the
+ * viewport through that scroll regardless of where the document ends up. But
+ * `.site-header` (which holds the close control) was only position:relative,
+ * so the fragment scroll carried it — and the only way to close the overlay —
+ * out of view along with it, with nothing on screen to indicate that had
+ * happened. Confirmed empirically with Playwright (JS disabled): the scroll
+ * itself worked, but the close button became unreachable immediately
+ * afterwards. Fixed by pinning `.site-header` with position:sticky for as
+ * long as the overlay is open (further down in this stylesheet), so the
+ * close control — and the scroll target it reveals once tapped — both stay
+ * reachable no matter where the anchor scroll lands.
  *
  * Net result: zero JavaScript. There is no enhancement layer to add.
  * ---------------------------------------------------------------------------
@@ -43,12 +68,6 @@
 import { SITE, NAV, FOOTER_NAV } from '../consts.js';
 import t from '../i18n/en.js';
 import { withBase } from '../lib/url';
-
-const path = Astro.url.pathname;
-const isCurrent = (href: string) => {
-  const full = withBase(href);
-  return href === '/' ? path === full : path === full || path.startsWith(full);
-};
 ---
 
 <header class="site-header">
@@ -87,9 +106,7 @@ const isCurrent = (href: string) => {
         {
           NAV.map((item) => (
             <li>
-              <a href={withBase(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
-                {t[item.key]}
-              </a>
+              <a href={withBase(item.href)}>{t[item.key]}</a>
             </li>
           ))
         }
@@ -253,11 +270,6 @@ const isCurrent = (href: string) => {
     border-block-end-color: var(--ink);
   }
 
-  .primary-nav__list a[aria-current='page'] {
-    color: var(--ink);
-    border-block-end-color: var(--ink);
-  }
-
   /* Secondary links belong to the overlay only. */
   .primary-nav__secondary {
     display: none;
@@ -298,6 +310,24 @@ const isCurrent = (href: string) => {
         animation: nav-in 180ms ease;
       }
 
+      /*
+       * Every NAV link is now a same-page `/#id` anchor. Tapping one while
+       * the overlay is open scrolls the underlying document immediately —
+       * `<details>` only ever closes via its own <summary>, so the overlay
+       * stays open through that scroll. `.primary-nav` is position:fixed so
+       * it keeps covering the viewport regardless, but the toggle that
+       * closes it lives in `.site-header`, which is normal-flow: if the
+       * document scrolls out from under it, the close control scrolls away
+       * too — and the fixed overlay masks that this happened, so there is no
+       * visible way back. Pin the header while the overlay is open so the
+       * close control (and brand link) stay reachable no matter where the
+       * anchor scroll lands.
+       */
+      .site-header:has(#site-nav[open]) {
+        position: sticky;
+        top: 0;
+      }
+
       .primary-nav__list {
         display: grid;
         gap: 0;
@@ -311,11 +341,6 @@ const isCurrent = (href: string) => {
         color: var(--ink);
         padding-block: var(--space-m);
         border-block-end: 1px solid var(--rule);
-      }
-
-      .primary-nav__list a[aria-current='page'] {
-        color: var(--accent);
-        border-block-end-color: var(--rule);
       }
 
       .primary-nav__secondary {
@@ -352,7 +377,11 @@ const isCurrent = (href: string) => {
    *   - page content is removed from the tab order (SC 2.4.11), and
    *   - the page behind cannot scroll.
    *
-   * Scoped to #site-nav so the <details> panels on project pages are unaffected.
+   * visibility:hidden rather than display:none — see the FOCUS CONTAINMENT
+   * comment at the top of this file for why: a fragment-navigation nav tap
+   * needs <main> to still have a layout box to scroll to.
+   *
+   * Scoped to #site-nav so project popovers are unaffected.
    */
   @supports selector(html:has(body)) {
     @media (max-width: 59.999rem) {
@@ -362,7 +391,7 @@ const isCurrent = (href: string) => {
 
       body:has(#site-nav[open]) > main,
       body:has(#site-nav[open]) > footer {
-        display: none;
+        visibility: hidden;
       }
     }
   }

@@ -111,7 +111,25 @@ for (const width of WIDTHS) {
        * is exactly the bug that made this check report false failures.
        */
       const scoped = (scope) => parts.map((p) => `${scope} ${p}`).join(', ');
-      const visible = (el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+      /**
+       * <main>/<footer> are hidden behind the overlay with visibility:hidden,
+       * not display:none (see SiteHeader.astro's FOCUS CONTAINMENT comment —
+       * visibility:hidden keeps their layout box so an in-page nav anchor can
+       * still scroll to its target once the overlay closes). offsetWidth /
+       * offsetHeight / getClientRects() all stay non-zero for a
+       * visibility:hidden element, since it still occupies layout space, so
+       * they alone can't tell "still reachable" apart from "correctly hidden
+       * but laid out" — the computed style check below is what actually
+       * distinguishes them.
+       */
+      const visible = (el) => {
+        const cs = getComputedStyle(el);
+        return (
+          cs.visibility !== 'hidden' &&
+          cs.display !== 'none' &&
+          !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+        );
+      };
       return {
         main: Array.from(document.querySelectorAll(scoped('main'))).filter(visible).length,
         footer: Array.from(document.querySelectorAll(scoped('footer'))).filter(visible).length,
@@ -155,6 +173,12 @@ console.log(`\n${'='.repeat(70)}\naxe scan with the mobile overlay OPEN (390px, 
   const page2 = await ctx2.newPage();
   await page2.goto(BASE + '/', { waitUntil: 'networkidle' });
   await page2.locator('#site-nav > summary').click();
+  // Let the overlay's 180ms fade-in (@keyframes nav-in) finish before
+  // scanning — mid-fade text is a genuine, momentary low-contrast blend of
+  // the real (passing) foreground/background colors, not a design defect.
+  // Scanning immediately after the click is a race that reports false
+  // color-contrast violations.
+  await page2.waitForTimeout(250);
   await page2.addScriptTag({ content: axeSource });
   const res = await page2.evaluate(async () =>
     // @ts-ignore

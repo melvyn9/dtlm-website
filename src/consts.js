@@ -107,17 +107,21 @@ export const ANALYTICS = {
 /**
  * Primary navigation.
  *
- * Paths preserve the existing WordPress URL structure. The client confirmed
- * on 14 Aug 2026 that /works/ and /portfolio/[slug]/ are kept rather than
- * moving to the /projects/ structure proposed in brief §4, so that no
- * project URL changes and no accumulated search ranking is at risk.
+ * The site is a single scrollable page now — every item is a same-page
+ * anchor into index.astro, not a separate route. Hrefs are root-relative
+ * (`/#id`, not bare `#id`) so they still resolve correctly from the
+ * standalone pages that remain real routes (accessibility, privacy,
+ * contact/thank-you, 404) — a bare `#id` there would try to scroll within a
+ * page that has no matching element.
  */
 export const NAV = [
-  { href: '/works/', key: 'nav.works' },
-  { href: '/about/', key: 'nav.about' },
-  { href: '/team/', key: 'nav.team' },
-  { href: '/news/', key: 'nav.news' },
-  { href: '/contact/', key: 'nav.contact' },
+  { href: '/#selected-works', key: 'nav.works' },
+  { href: '/#awards', key: 'nav.awards' },
+  { href: '/#news', key: 'nav.news' },
+  { href: '/#exhibitions', key: 'nav.exhibitions' },
+  { href: '/#museums', key: 'nav.museums' },
+  { href: '/#books', key: 'nav.books' },
+  { href: '/#contact', key: 'nav.contact' },
 ];
 
 export const FOOTER_NAV = [

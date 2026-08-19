@@ -1,0 +1,43 @@
+---
+/**
+ * A homepage section backed by the `press` collection: heading, list (or an
+ * empty/coming-soon state), and an optional slotted sub-group — used by News
+ * to nest a "Speaking engagements" list without a second full section.
+ */
+import PressList from './PressList.astro';
+import type { PressItem } from '../lib/content';
+import t from '../i18n/en.js';
+
+interface Props {
+  id: string;
+  heading: string;
+  items: PressItem[];
+  emptyMessage?: string;
+}
+const { id, heading, items, emptyMessage } = Astro.props;
+---
+
+<section id={id} class="wrap section--tight press-section" aria-labelledby={`${id}-heading`}>
+  <h2 id={`${id}-heading`}>{heading}</h2>
+  {
+    items.length > 0 ? (
+      <PressList items={items} />
+    ) : (
+      <p class="empty">{emptyMessage ?? t['press.comingSoon']}</p>
+    )
+  }
+  <slot />
+</section>
+
+<style>
+  .press-section h2 {
+    padding-block-end: var(--space-m);
+    margin-block-end: var(--space-l);
+    border-block-end: 1px solid var(--rule);
+  }
+
+  .empty {
+    color: var(--ink-muted);
+    max-width: var(--measure);
+  }
+</style>

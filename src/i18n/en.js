@@ -19,22 +19,16 @@ export default {
   'nav.footer': 'Legal and accessibility',
   'nav.home': 'Home',
   'nav.works': 'Works',
-  'nav.about': 'About',
-  'nav.team': 'Team',
+  'nav.awards': 'Awards',
   'nav.news': 'News & Press',
+  'nav.exhibitions': 'Exhibitions',
+  'nav.museums': 'Art Museums',
+  'nav.books': 'Books & Ideas',
   'nav.contact': 'Contact',
   'nav.accessibility': 'Accessibility',
   'nav.privacy': 'Privacy',
 
   'home.selected': 'Selected works',
-  'home.viewAll': 'View all works',
-  'home.recent': 'Recent recognition',
-  'home.viewAllPress': 'View all news and press',
-
-  'works.title': 'Works',
-  'works.count': (n) => `${n} ${n === 1 ? 'project' : 'projects'}`,
-  'works.filterAll': 'All',
-  'works.filterLabel': 'Filter by typology',
 
   'project.details': 'Project details',
   'project.year': 'Year',
@@ -48,12 +42,16 @@ export default {
   'project.awards': 'Awards',
   'project.publications': 'Publications',
   'project.photography': 'Photography',
-  'project.back': 'Back to all works',
+  'project.close': 'Close',
 
   'press.title': 'News & Press',
   'press.awards': 'Awards',
   'press.publications': 'Publications',
   'press.speaking': 'Speaking engagements',
+  'press.exhibitions': 'Exhibitions',
+  'press.museums': 'Art Museums',
+  'press.books': 'Books & Ideas',
+  'press.comingSoon': 'Coming soon.',
   'press.external': 'Opens in a new tab',
 
   'contact.title': 'Contact',
@@ -82,5 +80,5 @@ export default {
 
   'error.404.title': 'Page not found',
   'error.404.body':
-    'This page may have moved when the site was rebuilt. The works index is the best place to start.',
+    'This page may have moved when the site was rebuilt. The homepage is the best place to start.',
 };

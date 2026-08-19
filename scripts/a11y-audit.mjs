@@ -23,37 +23,15 @@ const axeSource = readFileSync(axePath, 'utf8');
 const BASE = process.argv[2] ?? 'http://localhost:4321';
 
 /**
- * Find a published project page to audit, if there is one.
- *
- * There may legitimately be none — every project is a draft until its alt
- * text, photographer credit and image rights are confirmed. In that case the
- * project-detail checks are skipped rather than failed, and the run says so.
+ * The site is a single page now — every former standalone route (works,
+ * portfolio detail, project-type, about, team, news, contact) is an anchor
+ * section on `/`. Only the pages that remain real routes are listed here.
  */
-async function findProjectPage() {
-  try {
-    const res = await fetch(`${BASE}/sitemap-0.xml`);
-    if (!res.ok) return null;
-    const xml = await res.text();
-    const match = xml.match(/<loc>[^<]*(\/portfolio\/[^<]+)<\/loc>/);
-    return match ? match[1] : null;
-  } catch {
-    return null;
-  }
-}
-
-const projectPage = await findProjectPage();
-
 const PAGES = [
   ['/', 'Home'],
-  ['/works/', 'Works index'],
-  ...(projectPage ? [[projectPage, 'Project detail']] : []),
-  ['/project-type/residential/', 'Typology filter'],
-  ['/team/', 'Team'],
-  ['/about/', 'About'],
-  ['/contact/', 'Contact'],
-  ['/news/', 'News & Press'],
   ['/accessibility/', 'Accessibility statement'],
   ['/privacy/', 'Privacy notice'],
+  ['/contact/thank-you/', 'Contact thank you'],
   ['/404.html', '404'],
 ];
 
@@ -157,7 +135,7 @@ for (const [path, label] of PAGES) {
 // ------------------------------------------------- form without JS --------
 const formCtx = await browser.newContext({ javaScriptEnabled: false });
 const formPage = await formCtx.newPage();
-await formPage.goto(BASE + '/contact/', { waitUntil: 'domcontentloaded' });
+await formPage.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
 const form = await formPage.evaluate(() => {
   const f = document.querySelector('form');
   return {
@@ -185,35 +163,50 @@ console.log(`  submit control present:  ${form.hasSubmit ? 'yes' : 'NO'}`);
 console.log(`  honeypot present:        ${form.honeypot ? 'yes' : 'NO'}`);
 console.log(`  every field has a label: ${form.labelled ? 'yes' : 'NO'}`);
 
-// ---------------------------------------------------- details/summary -----
-if (projectPage) {
-  const dCtx = await browser.newContext({ javaScriptEnabled: false });
-  const dPage = await dCtx.newPage();
-  await dPage.goto(BASE + projectPage, { waitUntil: 'domcontentloaded' });
+// ------------------------------------------------- project popover --------
+/**
+ * Project detail used to be its own page behind a <details> disclosure; it's
+ * now a same-DOM Popover-API panel (ProjectPopover.astro) opened by a
+ * <button popovertarget> in the Selected Works grid. `popovertarget` is a
+ * declarative HTML attribute, not scripted behaviour, so it must still work
+ * with JavaScript disabled — that's the whole point of choosing it over a
+ * JS-driven <dialog>.
+ *
+ * There may legitimately be no trigger — every project is a draft until its
+ * alt text, photographer credit and image rights are confirmed, and Selected
+ * Works only shows projects flagged `featured: true`. In that case the check
+ * is skipped rather than failed, and the run says so.
+ */
+{
+  const pCtx = await browser.newContext({ javaScriptEnabled: false });
+  const pPage = await pCtx.newPage();
+  await pPage.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
 
-  /**
-   * Scoped to `main`. The site header also contains a <details> — it is the
-   * state container for the mobile navigation overlay — and an unscoped
-   * `details` selector matches that one first, since the header precedes
-   * <main> in the document.
-   */
-  const details = dPage.locator('main details').first();
-  const before = await details.evaluate((el) => el.open);
-  await dPage.locator('main details > summary').first().click();
-  const after = await details.evaluate((el) => el.open);
-  await dCtx.close();
+  const trigger = pPage.locator('main button[popovertarget]').first();
+  const hasTrigger = (await trigger.count()) > 0;
 
-  const detailsOk = before === false && after === true;
-  if (!detailsOk) jsFailures++;
-  console.log(
-    `\nExpandable detail panel with JavaScript disabled: ${detailsOk ? 'PASS (opens)' : 'FAIL'}`,
-  );
-} else {
-  console.log(
-    '\nExpandable detail panel: SKIPPED — no published projects.' +
-      '\n  Every project is currently a draft. Run `PREVIEW_DRAFTS=1 npm run build`' +
-      '\n  first to audit project pages before they go live.',
-  );
+  if (hasTrigger) {
+    const popoverId = await trigger.getAttribute('popovertarget');
+    const popover = pPage.locator(`#${popoverId}`);
+
+    const beforeOpen = await popover.evaluate((el) => el.matches(':popover-open'));
+    await trigger.click();
+    const afterOpen = await popover.evaluate((el) => el.matches(':popover-open'));
+
+    const popoverOk = beforeOpen === false && afterOpen === true;
+    if (!popoverOk) jsFailures++;
+    console.log(
+      `\nProject popover with JavaScript disabled: ${popoverOk ? 'PASS (opens)' : 'FAIL'}`,
+    );
+  } else {
+    console.log(
+      '\nProject popover: SKIPPED — no featured, published projects.' +
+        '\n  Selected Works only shows projects flagged featured: true. Run' +
+        '\n  `PREVIEW_DRAFTS=1 npm run build` first to audit draft projects before launch.',
+    );
+  }
+
+  await pCtx.close();
 }
 
 await browser.close();
