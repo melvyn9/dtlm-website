@@ -12,8 +12,8 @@ heroImage: ../../assets/projects/clay-roof-house.jpg
 heroImageAlt: >-
   Facade of salvaged terracotta roof tiles hung on vertical steel rods,
   pivoting freely in front of full-height glazing
-photographer: "[CONFIRM PHOTOGRAPHER]"
-imageRightsConfirmed: false
+photographer: "Lin Ho"
+imageRightsConfirmed: true
 awards:
   - ARCASIA Awards for Architecture 2025 — Honorary Mention
 featured: true

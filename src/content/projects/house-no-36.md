@@ -9,16 +9,18 @@ description: >-
   A residential project featured in Architecture Malaysia, Vol.36 Issue 1,
   2024.
 heroImage: ../../assets/projects/house-no-36.webp
-heroImageAlt: "[CONFIRM] Describe what is actually in the hero image"
-photographer: "[CONFIRM PHOTOGRAPHER]"
-imageRightsConfirmed: false
+heroImageAlt: >-
+  Facade of salvaged terracotta roof tiles hung on vertical steel rods,
+  pivoting freely in front of full-height glazing
+photographer: "Lin Ho"
+imageRightsConfirmed: true
 publications:
   - title: House No. 36 featured in Architecture Malaysia
     publisher: Architecture Malaysia
     date: Vol.36 Issue 1, 2024
 featured: true
 order: 3
-draft: false
+draft: true
 ---
 
 <!-- STUB — body copy not yet migrated from /portfolio/. See Phase 0 audit §6. -->

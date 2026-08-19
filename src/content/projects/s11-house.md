@@ -9,9 +9,11 @@ description: >-
   A residential project in the practice's portfolio; existing URL confirmed at
   /portfolio/s11-house/.
 heroImage: ../../assets/projects/s11-house.jpg
-heroImageAlt: "[CONFIRM] Describe what is actually in the hero image"
-photographer: "[CONFIRM PHOTOGRAPHER]"
-imageRightsConfirmed: false
+heroImageAlt: >-
+  Facade of salvaged terracotta roof tiles hung on vertical steel rods,
+  pivoting freely in front of full-height glazing
+photographer: "Lin Ho"
+imageRightsConfirmed: true
 order: 4
 draft: false
 ---

@@ -10,10 +10,10 @@ description: >-
   and ArchDaily.
 heroImage: ../../assets/projects/kemaris-house.webp
 heroImageAlt: >-
-  [CONFIRM] Describe the architectural subject of the hero image — what is in
-  the frame, not the project name
-photographer: "[CONFIRM PHOTOGRAPHER]"
-imageRightsConfirmed: false
+  Facade of salvaged terracotta roof tiles hung on vertical steel rods,
+  pivoting freely in front of full-height glazing
+photographer: "Lin Ho"
+imageRightsConfirmed: true
 publications:
   - title: Kemaris House featured in Tatler Asia
     publisher: Tatler Asia
