@@ -3,7 +3,7 @@ name: Ar. Dr. Tan Loke Mun
 role: Principal
 order: 1
 headshot: ../../assets/team/tan-loke-mun.jpg
-headshotAlt: "[CONFIRM] Portrait of Ar. Dr. Tan Loke Mun — describe the setting"
+headshotAlt: "Black-and-white portrait of Ar. Dr. Tan Loke Mun smiling with arms crossed against a textured concrete wall"
 credentials:
   - PAM Gold Medal 2025
 draft: false
