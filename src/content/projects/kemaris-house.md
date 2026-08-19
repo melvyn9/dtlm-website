@@ -8,7 +8,7 @@ typology: residential
 description: >-
   A Kuala Lumpur house that has drawn international coverage in Tatler Asia
   and ArchDaily.
-heroImage: ../../assets/projects/kemaris-house.jpg
+heroImage: ../../assets/projects/kemaris-house.webp
 heroImageAlt: >-
   [CONFIRM] Describe the architectural subject of the hero image — what is in
   the frame, not the project name

@@ -8,7 +8,7 @@ typology: residential
 description: >-
   A residential project featured in Architecture Malaysia, Vol.36 Issue 1,
   2024.
-heroImage: ../../assets/projects/house-no-36.jpg
+heroImage: ../../assets/projects/house-no-36.webp
 heroImageAlt: "[CONFIRM] Describe what is actually in the hero image"
 photographer: "[CONFIRM PHOTOGRAPHER]"
 imageRightsConfirmed: false
