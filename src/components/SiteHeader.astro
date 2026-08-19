@@ -52,15 +52,18 @@
  * <details> only ever closes via its own <summary>, an anchor click can't
  * close it. `.primary-nav` is position:fixed, so it keeps covering the
  * viewport through that scroll regardless of where the document ends up. But
- * `.site-header` (which holds the close control) was only position:relative,
- * so the fragment scroll carried it — and the only way to close the overlay —
- * out of view along with it, with nothing on screen to indicate that had
- * happened. Confirmed empirically with Playwright (JS disabled): the scroll
- * itself worked, but the close button became unreachable immediately
- * afterwards. Fixed by pinning `.site-header` with position:sticky for as
- * long as the overlay is open (further down in this stylesheet), so the
- * close control — and the scroll target it reveals once tapped — both stay
- * reachable no matter where the anchor scroll lands.
+ * `.site-header` (which holds the close control) was only position:relative
+ * at the time, so the fragment scroll carried it — and the only way to close
+ * the overlay — out of view along with it, with nothing on screen to
+ * indicate that had happened. Confirmed empirically with Playwright (JS
+ * disabled): the scroll itself worked, but the close button became
+ * unreachable immediately afterwards.
+ *
+ * `.site-header` is now sticky on every mobile viewport, not just while the
+ * overlay is open — a deliberate UX choice so the toggle is always one tap
+ * away on a long page, not just a fix for the bug above. It still resolves
+ * that bug as a side effect: the close control (and the section a scroll
+ * just landed on) stay reachable no matter where the page has scrolled to.
  *
  * ONE PIECE OF JAVASCRIPT — THE FIRST IN THIS CODEBASE
  *
@@ -161,6 +164,24 @@ import { withBase } from '../lib/url';
     background: var(--paper);
     position: relative;
     z-index: 50;
+  }
+
+  /*
+   * Sticky on mobile so the toggle (and the nav it reveals) is always one
+   * tap away, without scrolling back to the top of a long page. Desktop
+   * doesn't need this — the nav is already fully visible inline.
+   *
+   * Not gated behind @supports selector(html:has(body)) — position:sticky
+   * doesn't depend on :has() at all, so browsers without it still get a
+   * persistent header even though they fall back to wrapped inline links
+   * instead of the overlay (see the MOBILE — full-screen overlay comment
+   * below).
+   */
+  @media (max-width: 59.999rem) {
+    .site-header {
+      position: sticky;
+      top: 0;
+    }
   }
 
   .site-header__inner {
@@ -339,24 +360,6 @@ import { withBase } from '../lib/url';
         overflow-y: auto;
         overscroll-behavior: contain;
         animation: nav-in 180ms ease;
-      }
-
-      /*
-       * Every NAV link is now a same-page `/#id` anchor. Tapping one while
-       * the overlay is open scrolls the underlying document immediately —
-       * `<details>` only ever closes via its own <summary>, so the overlay
-       * stays open through that scroll. `.primary-nav` is position:fixed so
-       * it keeps covering the viewport regardless, but the toggle that
-       * closes it lives in `.site-header`, which is normal-flow: if the
-       * document scrolls out from under it, the close control scrolls away
-       * too — and the fixed overlay masks that this happened, so there is no
-       * visible way back. Pin the header while the overlay is open so the
-       * close control (and brand link) stay reachable no matter where the
-       * anchor scroll lands.
-       */
-      .site-header:has(#site-nav[open]) {
-        position: sticky;
-        top: 0;
       }
 
       .primary-nav__list {
