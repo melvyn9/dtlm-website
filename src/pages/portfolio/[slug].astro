@@ -16,7 +16,6 @@ import DraftNotice from '../../components/DraftNotice.astro';
 import { getProjects } from '../../lib/content';
 import { render } from 'astro:content';
 import t from '../../i18n/en.js';
-import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -145,7 +144,7 @@ const details = [
         </details>
 
         <p class="back">
-          <a href={withBase('/works/')}>{t['project.back']}</a>
+          <a href="/works/">{t['project.back']}</a>
         </p>
       </div>
     </div>

@@ -78,7 +78,7 @@ featured: false
 order: 999
   # Lower numbers sort first on the works index.
 
-draft: true
+draft: false
   # true = visible when previewing locally, EXCLUDED from the live site.
   # Set to false only when everything above is complete and confirmed.
 ---

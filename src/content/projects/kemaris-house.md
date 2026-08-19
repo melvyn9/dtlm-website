@@ -21,7 +21,7 @@ publications:
     publisher: ArchDaily
 featured: true
 order: 2
-draft: true
+draft: false
 ---
 
 <!--

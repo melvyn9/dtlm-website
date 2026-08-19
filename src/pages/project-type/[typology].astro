@@ -15,7 +15,6 @@ import DraftNotice from '../../components/DraftNotice.astro';
 import { getProjects } from '../../lib/content';
 import { TYPOLOGIES } from '../../consts.js';
 import t from '../../i18n/en.js';
-import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
   const projects = await getProjects();
@@ -46,12 +45,12 @@ const filters = TYPOLOGIES.filter((ty) => used.has(ty));
 
     <nav class="filters" aria-label={t['works.filterLabel']}>
       <ul>
-        <li><a href={withBase('/works/')}>{t['works.filterAll']}</a></li>
+        <li><a href="/works/">{t['works.filterAll']}</a></li>
         {
           filters.map((ty) => (
             <li>
               <a
-                href={withBase(`/project-type/${ty}/`)}
+                href={`/project-type/${ty}/`}
                 aria-current={ty === typology ? 'page' : undefined}
               >
                 {t[`typology.${ty}`]}
@@ -68,7 +67,7 @@ const filters = TYPOLOGIES.filter((ty) => used.has(ty));
           {projects.map((project, i) => (
             <li>
               <ProjectCard
-                href={withBase(`/portfolio/${project.data.slug}/`)}
+                href={`/portfolio/${project.data.slug}/`}
                 title={project.data.title}
                 location={project.data.location}
                 year={project.data.year}
@@ -83,7 +82,7 @@ const filters = TYPOLOGIES.filter((ty) => used.has(ty));
       ) : (
         <p class="empty">
           No {label.toLowerCase()} projects are published yet.
-          <a href={withBase('/works/')}>View all works</a>.
+          <a href="/works/">View all works</a>.
         </p>
       )
     }

@@ -1,43 +1,104 @@
 ---
 /**
- * Site header.
+ * Site header with a full-screen mobile navigation overlay.
  *
- * Deliberately has no JavaScript. There is no hamburger toggle: on narrow
- * viewports the navigation wraps to a second line instead of hiding behind
- * a button that would not open with JS disabled (§2.1).
+ * ---------------------------------------------------------------------------
+ * WHY THIS IS BUILT ON <details> AND NOT A JAVASCRIPT TOGGLE
  *
- * aria-current="page" marks the active item — this is the accessible
- * equivalent of the visual underline, and costs nothing.
+ * Brief §2.1: the site must work with JavaScript disabled — "all navigation
+ * functional". A conventional hamburger wired to a click handler fails that
+ * outright: with JS off the button does nothing and the entire navigation
+ * becomes unreachable on mobile.
+ *
+ * Brief §4 already prescribes the answer for expandable content: use the
+ * native <details>/<summary>. It toggles with zero JavaScript, is keyboard
+ * operable, and is announced as a disclosure control by screen readers.
+ *
+ * WHY THE LINKS ARE A SIBLING OF <details> RATHER THAN ITS CHILDREN
+ *
+ * The obvious structure — links nested inside the <details> — cannot be made
+ * to display inline on desktop. Browsers hide a closed <details>'s content via
+ * `content-visibility: hidden` on an internal shadow-DOM slot, which author
+ * CSS cannot override. (Chrome 131+ exposes `::details-content` for exactly
+ * this, but Safari and Firefox do not, so relying on it would break desktop
+ * navigation in those browsers.) This was verified empirically, not assumed:
+ * the nested version rendered the links with correct computed styles but zero
+ * layout height, and they were unreachable at every desktop width.
+ *
+ * So <details> holds only the toggle and acts as a pure state container, and
+ * `:has()` drives the overlay on its sibling <nav>. The links are ordinary
+ * markup that is always rendered — nothing depends on how a browser chooses
+ * to render collapsed <details> content.
+ *
+ * FOCUS CONTAINMENT WITHOUT A JAVASCRIPT FOCUS TRAP
+ *
+ * WCAG 2.2 SC 2.4.11 (Focus Not Obscured) is satisfied by setting <main> and
+ * <footer> to display:none while the overlay is open, which removes everything
+ * behind it from the tab order. A full-screen menu hides that content visually
+ * anyway, so this matches what the user sees.
+ *
+ * Net result: zero JavaScript. There is no enhancement layer to add.
+ * ---------------------------------------------------------------------------
  */
-import { SITE, NAV } from '../consts.js';
+import { SITE, NAV, FOOTER_NAV } from '../consts.js';
 import t from '../i18n/en.js';
-import { withBase } from '../lib/url';
 
 const path = Astro.url.pathname;
-const isCurrent = (href: string) => {
-  const full = withBase(href);
-  return href === '/' ? path === full : path === full || path.startsWith(full);
-};
+const isCurrent = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href);
 ---
 
 <header class="site-header">
   <div class="wrap site-header__inner">
-    <a class="site-header__brand" href={withBase('/')}>
+    <a class="site-header__brand" href="/">
       <span class="site-header__name">{SITE.name}</span>
       <span class="site-header__tagline">{SITE.tagline}</span>
     </a>
 
-    <nav aria-label={t['nav.primary']}>
-      <ul class="site-header__nav">
+    <!--
+      State container only. Its <summary> is the hamburger when closed and the
+      ✕ when open — one control, one focus stop, no state to synchronise.
+    -->
+    <details class="nav-toggle-wrap" id="site-nav">
+      <summary class="nav-toggle" aria-controls="primary-nav">
+        <span class="nav-toggle__icon nav-toggle__icon--menu">
+          <span class="nav-toggle__bars" aria-hidden="true"></span>
+          <span class="visually-hidden">Open menu</span>
+        </span>
+        <span class="nav-toggle__icon nav-toggle__icon--close">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+            <path
+              d="M5 5 L19 19 M19 5 L5 19"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              fill="none"></path>
+          </svg>
+          <span class="visually-hidden">Close menu</span>
+        </span>
+      </summary>
+    </details>
+
+    <nav id="primary-nav" class="primary-nav" aria-label={t['nav.primary']}>
+      <ul class="primary-nav__list">
         {
           NAV.map((item) => (
             <li>
-              <a href={withBase(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
                 {t[item.key]}
               </a>
             </li>
           ))
         }
+      </ul>
+
+      <!--
+        Secondary links appear inside the overlay on small screens only. On
+        desktop they live in the footer, so they are hidden here rather than
+        announced twice.
+      -->
+      <ul class="primary-nav__secondary">
+        {FOOTER_NAV.map((item) => <li><a href={item.href}>{t[item.key]}</a></li>)}
       </ul>
     </nav>
   </div>
@@ -47,12 +108,13 @@ const isCurrent = (href: string) => {
   .site-header {
     border-block-end: 1px solid var(--rule);
     background: var(--paper);
+    position: relative;
+    z-index: 50;
   }
 
   .site-header__inner {
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-s) var(--space-l);
     padding-block: var(--space-m);
@@ -62,6 +124,9 @@ const isCurrent = (href: string) => {
     color: var(--ink);
     text-decoration: none;
     display: block;
+    /* Stays above the overlay so it remains visible and clickable. */
+    position: relative;
+    z-index: 2;
   }
 
   .site-header__name {
@@ -78,33 +143,224 @@ const isCurrent = (href: string) => {
     margin-block-start: var(--space-3xs);
   }
 
-  .site-header__nav {
+  /* ===================================================================
+     Toggle control
+     =================================================================== */
+
+  .nav-toggle-wrap {
+    position: relative;
+    z-index: 2;
+  }
+
+  .nav-toggle {
+    list-style: none; /* removes the native disclosure triangle */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Comfortably above the 24×24px WCAG 2.2 target minimum (§7). */
+    width: 44px;
+    height: 44px;
+    margin-inline-end: -10px;
+    color: var(--ink);
+  }
+
+  .nav-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .nav-toggle__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Hamburger bars drawn in CSS — no icon request. */
+  .nav-toggle__bars,
+  .nav-toggle__bars::before,
+  .nav-toggle__bars::after {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 2px;
+  }
+
+  .nav-toggle__bars {
+    position: relative;
+  }
+
+  .nav-toggle__bars::before,
+  .nav-toggle__bars::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  .nav-toggle__bars::before {
+    top: -7px;
+  }
+  .nav-toggle__bars::after {
+    top: 7px;
+  }
+
+  /* Swap hamburger ⇄ ✕ from the open state alone. */
+  .nav-toggle__icon--close {
+    display: none;
+  }
+
+  #site-nav[open] .nav-toggle__icon--menu {
+    display: none;
+  }
+
+  #site-nav[open] .nav-toggle__icon--close {
+    display: flex;
+  }
+
+  /* ===================================================================
+     Navigation — desktop default (inline), overlay applied below
+     =================================================================== */
+
+  .primary-nav__list,
+  .primary-nav__secondary {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .primary-nav__list {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-s) var(--space-m);
-    list-style: none;
-    padding: 0;
   }
 
-  .site-header__nav a {
-    color: var(--ink-muted);
-    text-decoration: none;
+  .primary-nav__list a {
+    display: inline-block;
     font-size: var(--step--1);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    /* 24×24px minimum target (§7) — padding does the work, not a fixed size. */
-    display: inline-block;
+    text-decoration: none;
+    color: var(--ink-muted);
     padding-block: var(--space-3xs);
     border-block-end: 1px solid transparent;
   }
 
-  .site-header__nav a:hover {
+  .primary-nav__list a:hover {
     color: var(--ink);
     border-block-end-color: var(--ink);
   }
 
-  .site-header__nav a[aria-current='page'] {
+  .primary-nav__list a[aria-current='page'] {
     color: var(--ink);
     border-block-end-color: var(--ink);
+  }
+
+  /* Secondary links belong to the overlay only. */
+  .primary-nav__secondary {
+    display: none;
+  }
+
+  /* Desktop needs no toggle. */
+  @media (min-width: 60rem) {
+    .nav-toggle-wrap {
+      display: none;
+    }
+  }
+
+  /* ===================================================================
+     MOBILE — full-screen overlay
+     ===================================================================
+     Wrapped in @supports: if a browser cannot do :has(), the overlay can
+     never be opened, so the navigation must NOT be hidden. Such browsers
+     fall back to the links simply wrapping onto a second line — less tidy,
+     but navigation stays reachable. Requirement §2.1 is never traded for
+     appearance.
+     =================================================================== */
+
+  @supports selector(html:has(body)) {
+    @media (max-width: 59.999rem) {
+      .primary-nav {
+        display: none;
+      }
+
+      .site-header:has(#site-nav[open]) .primary-nav {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        background: var(--paper);
+        padding: calc(var(--space-2xl) + var(--space-s)) var(--gutter) var(--space-xl);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        animation: nav-in 180ms ease;
+      }
+
+      .primary-nav__list {
+        display: grid;
+        gap: 0;
+      }
+
+      .primary-nav__list a {
+        display: block;
+        font-size: var(--step-2);
+        letter-spacing: -0.01em;
+        text-transform: none;
+        color: var(--ink);
+        padding-block: var(--space-m);
+        border-block-end: 1px solid var(--rule);
+      }
+
+      .primary-nav__list a[aria-current='page'] {
+        color: var(--accent);
+        border-block-end-color: var(--rule);
+      }
+
+      .primary-nav__secondary {
+        display: grid;
+        gap: var(--space-2xs);
+        margin-block-start: var(--space-xl);
+      }
+
+      .primary-nav__secondary a {
+        display: inline-block;
+        color: var(--ink-muted);
+        font-size: var(--step--1);
+        padding-block: var(--space-3xs);
+      }
+    }
+  }
+
+  @keyframes nav-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>
+
+<style is:global>
+  /*
+   * Global, because these rules target <main> and <footer>, which are siblings
+   * of the header and therefore outside this component's scoped styles.
+   *
+   * While the overlay is open on small screens:
+   *   - page content is removed from the tab order (SC 2.4.11), and
+   *   - the page behind cannot scroll.
+   *
+   * Scoped to #site-nav so the <details> panels on project pages are unaffected.
+   */
+  @supports selector(html:has(body)) {
+    @media (max-width: 59.999rem) {
+      body:has(#site-nav[open]) {
+        overflow: hidden;
+      }
+
+      body:has(#site-nav[open]) > main,
+      body:has(#site-nav[open]) > footer {
+        display: none;
+      }
+    }
   }
 </style>

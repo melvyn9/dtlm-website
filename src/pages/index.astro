@@ -5,7 +5,6 @@ import DraftNotice from '../components/DraftNotice.astro';
 import { getFeaturedProjects, getPress, formatPressDate } from '../lib/content';
 import { SITE } from '../consts.js';
 import t from '../i18n/en.js';
-import { withBase } from '../lib/url';
 
 const featured = await getFeaturedProjects(6);
 const press = (await getPress()).filter((p) => p.data.featured).slice(0, 3);
@@ -31,14 +30,14 @@ const draftCount = featured.filter((p) => p.data.draft).length;
         <section class="section--tight" aria-labelledby="selected-works">
           <div class="section-head">
             <h2 id="selected-works">{t['home.selected']}</h2>
-            <a href={withBase('/works/')}>{t['home.viewAll']}</a>
+            <a href="/works/">{t['home.viewAll']}</a>
           </div>
 
           <ul class="grid">
             {featured.map((project, i) => (
               <li>
                 <ProjectCard
-                  href={withBase(`/portfolio/${project.data.slug}/`)}
+                  href={`/portfolio/${project.data.slug}/`}
                   title={project.data.title}
                   location={project.data.location}
                   year={project.data.year}
@@ -70,7 +69,7 @@ const draftCount = featured.filter((p) => p.data.draft).length;
         <section class="section--tight" aria-labelledby="recent">
           <div class="section-head">
             <h2 id="recent">{t['home.recent']}</h2>
-            <a href={withBase('/news/')}>{t['home.viewAllPress']}</a>
+            <a href="/news/">{t['home.viewAllPress']}</a>
           </div>
 
           <ul class="press-list">

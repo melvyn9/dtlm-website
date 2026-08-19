@@ -191,9 +191,15 @@ if (projectPage) {
   const dPage = await dCtx.newPage();
   await dPage.goto(BASE + projectPage, { waitUntil: 'domcontentloaded' });
 
-  const details = dPage.locator('details').first();
+  /**
+   * Scoped to `main`. The site header also contains a <details> — it is the
+   * state container for the mobile navigation overlay — and an unscoped
+   * `details` selector matches that one first, since the header precedes
+   * <main> in the document.
+   */
+  const details = dPage.locator('main details').first();
   const before = await details.evaluate((el) => el.open);
-  await dPage.locator('details > summary').first().click();
+  await dPage.locator('main details > summary').first().click();
   const after = await details.evaluate((el) => el.open);
   await dCtx.close();
 

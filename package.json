@@ -12,7 +12,8 @@
     "check": "astro check",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:a11y": "node scripts/a11y-audit.mjs",
-    "verify": "npm run check:contrast && npm run build && npm run check:a11y"
+    "check:nav": "node scripts/nav-responsive-audit.mjs",
+    "verify": "npm run check:contrast && npm run build && npm run check:a11y && npm run check:nav"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

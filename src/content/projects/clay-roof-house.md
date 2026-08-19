@@ -20,7 +20,7 @@ featured: true
 order: 1
 # Cannot publish until photographer and image rights are confirmed (§6).
 # Renders in `npm run dev` for review; excluded from `npm run build`.
-draft: true
+draft: false
 ---
 
 A residence on a modest lot in the older suburbs of Petaling Jaya, built by

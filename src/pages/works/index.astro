@@ -16,7 +16,6 @@ import DraftNotice from '../../components/DraftNotice.astro';
 import { getProjects } from '../../lib/content';
 import { TYPOLOGIES } from '../../consts.js';
 import t from '../../i18n/en.js';
-import { withBase } from '../../lib/url';
 
 const projects = await getProjects();
 const draftCount = projects.filter((p) => p.data.draft).length;
@@ -42,13 +41,13 @@ const filters = TYPOLOGIES.filter((ty) => used.has(ty));
         <nav class="filters" aria-label={t['works.filterLabel']}>
           <ul>
             <li>
-              <a href={withBase('/works/')} aria-current="page">
+              <a href="/works/" aria-current="page">
                 {t['works.filterAll']}
               </a>
             </li>
             {filters.map((ty) => (
               <li>
-                <a href={withBase(`/project-type/${ty}/`)}>{t[`typology.${ty}`]}</a>
+                <a href={`/project-type/${ty}/`}>{t[`typology.${ty}`]}</a>
               </li>
             ))}
           </ul>
@@ -62,7 +61,7 @@ const filters = TYPOLOGIES.filter((ty) => used.has(ty));
           {projects.map((project, i) => (
             <li>
               <ProjectCard
-                href={withBase(`/portfolio/${project.data.slug}/`)}
+                href={`/portfolio/${project.data.slug}/`}
                 title={project.data.title}
                 location={project.data.location}
                 year={project.data.year}

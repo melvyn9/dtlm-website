@@ -6,7 +6,7 @@ headshot: ../../assets/team/tan-loke-mun.jpg
 headshotAlt: "[CONFIRM] Portrait of Ar. Dr. Tan Loke Mun — describe the setting"
 credentials:
   - PAM Gold Medal 2025
-draft: true
+draft: false
 ---
 
 <!--

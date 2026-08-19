@@ -468,6 +468,45 @@ These come from the project brief and are deliberate, not accidental:
 4. **Use `<details>`/`<summary>` for expandable content.** Style it; do not
    rebuild it in JavaScript. It is keyboard operable and correctly announced by
    screen readers for free.
+
+### The mobile navigation
+
+The full-screen mobile menu contains no JavaScript. It is worth understanding
+before changing it, because the structure is not the obvious one.
+
+A `<details>` element in the header holds **only the toggle button**. The
+navigation links are a **sibling** `<nav id="primary-nav">`, and `:has()`
+drives the overlay:
+
+```css
+.site-header:has(#site-nav[open]) .primary-nav { position: fixed; inset: 0; … }
+```
+
+The obvious structure — links nested inside the `<details>` — cannot be made to
+display inline on desktop. Browsers hide a closed `<details>`'s content using
+`content-visibility: hidden` on an internal shadow-DOM slot that author CSS
+cannot reach. Chrome 131+ exposes `::details-content` for this, but Safari and
+Firefox do not, so depending on it would leave desktop navigation invisible in
+those browsers. This was verified in a real browser, not assumed: the nested
+version produced links with correct computed styles, zero layout height, and no
+reachable navigation at any desktop width.
+
+Three consequences to preserve if you touch this:
+
+- **The overlay rules sit inside `@supports selector(html:has(body))`.** If a
+  browser cannot do `:has()`, the overlay could never open — so in that case
+  the navigation must *not* be hidden. Those browsers get links that wrap onto
+  a second line. Never trade requirement 1 for appearance.
+- **`<main>` and `<footer>` are set to `display: none` while the overlay is
+  open.** That is what keeps focus inside the overlay (WCAG 2.2 SC 2.4.11)
+  without a JavaScript focus trap. Removing it lets keyboard focus wander to
+  invisible content behind the menu.
+- **A `details` selector in a test or stylesheet now matches the nav toggle
+  too**, and the header precedes `<main>` in the document. Scope to
+  `main details` when you mean a project panel.
+
+`npm run check:nav` exercises all of this at 13 viewport widths with
+JavaScript disabled.
 5. **Target WCAG 2.2 Level AA.** Do not add a text colour without adding the
    pair to `scripts/check-contrast.mjs`.
 6. **Performance budget:** under 1MB first load, LCP under 2.5s on 4G.
@@ -481,7 +520,8 @@ npm run preview         # serve the production build locally
 npm run check           # TypeScript and Astro diagnostics
 npm run check:contrast  # WCAG contrast check on the palette
 npm run check:a11y      # axe + no-JS + page weight audit (needs a server running)
-npm run verify          # contrast, then build, then a11y audit
+npm run check:nav       # mobile/desktop nav at 13 widths, JS disabled
+npm run verify          # contrast → build → a11y audit → nav audit
 ```
 
 `check:a11y` expects the built site to be served at `http://localhost:4321`.
@@ -513,6 +553,7 @@ public/
 scripts/
   check-contrast.mjs     WCAG contrast validator
   a11y-audit.mjs         axe + no-JS + performance budget audit
+  nav-responsive-audit.mjs  Mobile/desktop nav across 13 widths, JS disabled
 ```
 
 ### The draft mechanism

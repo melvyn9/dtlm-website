@@ -13,7 +13,7 @@ heroImageAlt: "[CONFIRM] Describe what is actually in the hero image"
 photographer: "[CONFIRM PHOTOGRAPHER]"
 imageRightsConfirmed: false
 order: 4
-draft: true
+draft: false
 ---
 
 <!-- STUB — body copy not yet migrated from /portfolio/. See Phase 0 audit §6. -->
