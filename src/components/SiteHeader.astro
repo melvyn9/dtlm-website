@@ -62,7 +62,25 @@
  * close control — and the scroll target it reveals once tapped — both stay
  * reachable no matter where the anchor scroll lands.
  *
- * Net result: zero JavaScript. There is no enhancement layer to add.
+ * ONE PIECE OF JAVASCRIPT — THE FIRST IN THIS CODEBASE
+ *
+ * Tapping a NAV link while the overlay is open scrolls correctly (fixed
+ * above) but does not close the overlay — `<details>` only ever closes via
+ * its own <summary>, and there is no zero-JS way to close it as a side
+ * effect of an unrelated link click. A `:target`-based CSS alternative was
+ * tried and rejected: `:target` is a persistent match on the current URL
+ * fragment, not a one-time "just navigated" event, so a rule that force-hides
+ * the overlay while any section is `:target`ed would also block it from ever
+ * reopening again for the rest of the visit, once any anchor had been
+ * visited once. There is no CSS-only way to express "just navigated" as
+ * distinct from "currently navigated."
+ *
+ * The script below closes the overlay when a NAV link is clicked. It is
+ * strictly progressive enhancement, not a dependency: with JavaScript
+ * disabled, the link still works and the overlay simply stays open until the
+ * user taps the toggle once more — the pre-existing, fully-functional
+ * behavior everywhere above this comment. With it enabled, the overlay
+ * closes immediately, matching what the scroll already did underneath it.
  * ---------------------------------------------------------------------------
  */
 import { SITE, NAV, FOOTER_NAV } from '../consts.js';
@@ -123,6 +141,19 @@ import { withBase } from '../lib/url';
     </nav>
   </div>
 </header>
+
+<script>
+  // Progressive enhancement only — see "ONE PIECE OF JAVASCRIPT" above.
+  // Closes the mobile overlay when a nav link is tapped. Without this,
+  // the link still works; the overlay just needs a second tap to close.
+  const nav = document.getElementById('site-nav');
+  const primaryNav = document.getElementById('primary-nav');
+  if (nav && primaryNav) {
+    primaryNav.addEventListener('click', (event) => {
+      if (event.target.closest('a')) nav.open = false;
+    });
+  }
+</script>
 
 <style>
   .site-header {
