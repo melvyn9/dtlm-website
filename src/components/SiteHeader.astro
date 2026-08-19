@@ -42,15 +42,18 @@
  */
 import { SITE, NAV, FOOTER_NAV } from '../consts.js';
 import t from '../i18n/en.js';
+import { withBase } from '../lib/url';
 
 const path = Astro.url.pathname;
-const isCurrent = (href: string) =>
-  href === '/' ? path === '/' : path === href || path.startsWith(href);
+const isCurrent = (href: string) => {
+  const full = withBase(href);
+  return href === '/' ? path === full : path === full || path.startsWith(full);
+};
 ---
 
 <header class="site-header">
   <div class="wrap site-header__inner">
-    <a class="site-header__brand" href="/">
+    <a class="site-header__brand" href={withBase('/')}>
       <span class="site-header__name">{SITE.name}</span>
       <span class="site-header__tagline">{SITE.tagline}</span>
     </a>
@@ -84,7 +87,7 @@ const isCurrent = (href: string) =>
         {
           NAV.map((item) => (
             <li>
-              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+              <a href={withBase(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
                 {t[item.key]}
               </a>
             </li>
@@ -98,7 +101,7 @@ const isCurrent = (href: string) =>
         announced twice.
       -->
       <ul class="primary-nav__secondary">
-        {FOOTER_NAV.map((item) => <li><a href={item.href}>{t[item.key]}</a></li>)}
+        {FOOTER_NAV.map((item) => <li><a href={withBase(item.href)}>{t[item.key]}</a></li>)}
       </ul>
     </nav>
   </div>

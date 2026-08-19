@@ -15,6 +15,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { SITE } from '../consts.js';
 import t from '../i18n/en.js';
+import { withBase } from '../lib/url';
 
 interface Props {
   title: string;
@@ -48,7 +49,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
     {ogImage && <meta property="og:image" content={new URL(ogImage, SITE.url).href} />}
 
     <meta name="generator" content={Astro.generator} />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
   </head>
 
   <body>

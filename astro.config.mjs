@@ -13,8 +13,15 @@ import { SITE } from './src/consts.js';
 // locale. Adding Bahasa Malaysia later means adding 'ms' to `locales` and
 // a src/i18n/ms.ts strings file — not restructuring the site.
 
+// GitHub Pages preview build. Set only by .github/workflows/gh-pages.yml, so
+// the real production build (Cloudflare Pages) is untouched — this repo's
+// production `site` and root-relative paths keep working exactly as before.
+const GH_PAGES = process.env.GITHUB_PAGES === 'true';
+const GH_PAGES_REPO = 'dtlm-website';
+
 export default defineConfig({
-  site: SITE.url,
+  site: GH_PAGES ? `https://${process.env.GITHUB_REPOSITORY_OWNER}.github.io` : SITE.url,
+  base: GH_PAGES ? `/${GH_PAGES_REPO}` : undefined,
 
   // Fully static output. The build artifact is plain files, so changing
   // hosts is trivial (§2.6).

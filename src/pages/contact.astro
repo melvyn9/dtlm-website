@@ -12,6 +12,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { CONTACT, FORM, SITE } from '../consts.js';
 import t from '../i18n/en.js';
+import { withBase } from '../lib/url';
 ---
 
 <BaseLayout
@@ -144,7 +145,7 @@ import t from '../i18n/en.js';
 
           <p class="form__privacy">
             Your details are sent to the practice by email and are not used for
-            anything else. See our <a href="/privacy/">privacy notice</a>.
+            anything else. See our <a href={withBase('/privacy/')}>privacy notice</a>.
           </p>
         </form>
       </section>

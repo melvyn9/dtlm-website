@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../consts.js';
+import { withBase } from '../lib/url';
 ---
 
 <BaseLayout
@@ -44,7 +45,7 @@ import { SITE } from '../consts.js';
         the existing site.]
       </p>
 
-      <p><a href="/team/">Meet the team</a> · <a href="/works/">View our work</a></p>
+      <p><a href={withBase('/team/')}>Meet the team</a> · <a href={withBase('/works/')}>View our work</a></p>
     </div>
   </div>
 </BaseLayout>
