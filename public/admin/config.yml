@@ -1,0 +1,337 @@
+# Content admin config — Sveltia CMS (https://sveltiacms.app).
+#
+# This reads and writes the exact same Markdown files in src/content/ that
+# src/content.config.ts already validates at build time. Saving here commits
+# straight to `main`; the existing Cloudflare Pages git integration builds and
+# deploys it exactly like any other commit. See src/content.config.ts for the
+# authoritative schema — this file only narrows the space of accidental
+# mistakes (typos, missing fields, malformed URLs); it cannot and does not
+# replace that schema as the real gate. In particular the placeholder-text
+# check and the "imageRightsConfirmed must be true before publish" rule are
+# deliberately NOT mirrored here (they're conditional on `draft`, which static
+# CMS field validation can't express) — every new entry defaults to
+# draft: true specifically so that gap is safe rather than a loophole.
+
+backend:
+  name: github
+  repo: melvyn9/dtlm-website
+  # TEMPORARY: rehearsing the real login-and-commit flow against a scratch
+  # branch before trusting it against main. Switch back to `main` once a test
+  # entry's resulting commit has been inspected and looks right.
+  branch: cms-test
+  base_url: https://sveltia-cms-auth.melvyn9.workers.dev
+
+# Local testing: open http://localhost:4321/admin/index.html in Chrome or
+# Edge while `npm run dev` is running. Sveltia CMS uses the File System
+# Access API for local git testing — no proxy server or extra config needed.
+
+media_folder: src/assets/uploads
+public_folder: src/assets/uploads
+
+collections:
+  # ===========================================================================
+  # SELECTED WORKS  →  src/content/projects/*.md
+  # ===========================================================================
+  - name: projects
+    label: "Selected Works"
+    label_singular: "Project"
+    folder: "src/content/projects"
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{fields.title}}"
+    summary: "{{title}} — {{year}}"
+    fields:
+      - label: "Title"
+        name: title
+        widget: string
+        required: true
+
+      - label: "Technical ID (auto-suggested from the title — safe to leave as-is)"
+        name: slug
+        widget: string
+        required: true
+        pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Lowercase letters, numbers and single hyphens only, e.g. verandah-house"]
+        hint: "Used internally to identify this project on the page. Doesn't need to be perfect."
+
+      - label: "Year"
+        name: year
+        widget: number
+        value_type: int
+        min: 1960
+        max: 2036
+        required: true
+
+      - label: "Location (City, country)"
+        name: location
+        widget: string
+        required: true
+        hint: "e.g. Kuala Lumpur, Malaysia"
+
+      - label: "Client"
+        name: client
+        widget: string
+        required: false
+        hint: "Optional. Check confidentiality with the practice before naming a client."
+
+      - label: "Status"
+        name: status
+        widget: select
+        required: true
+        options: ["built", "under-construction", "competition", "unbuilt"]
+
+      - label: "Typology"
+        name: typology
+        widget: select
+        required: true
+        options: ["residential", "commercial", "civic", "institutional", "interior"]
+
+      - label: "Area (square metres)"
+        name: area
+        widget: number
+        value_type: float
+        min: 0
+        required: false
+
+      - label: "Short description"
+        name: description
+        widget: text
+        required: true
+        pattern: ["^[\\s\\S]{20,}$", "Needs to be at least 20 characters — a real sentence, not a fragment"]
+        hint: "Shown on the project card and used as the page's search-result summary. Write it for someone who hasn't seen the building."
+
+      - label: "Hero image"
+        name: heroImage
+        widget: image
+        required: true
+        media_folder: "../../assets/projects"
+        public_folder: "../../assets/projects"
+        hint: "Max 2500px on the long edge, under 2MB."
+
+      - label: "Hero image alt text"
+        name: heroImageAlt
+        widget: text
+        required: true
+        pattern: ["^[\\s\\S]{15,}$", "At least 15 characters"]
+        hint: >-
+          Describe the architectural subject — what is actually in the frame,
+          not the project name. Don't start with "image of" / "photo of"
+          (screen readers already announce that it's an image), and don't
+          just repeat the title — the build will reject both.
+
+      - label: "Photographer"
+        name: photographer
+        widget: string
+        required: true
+        hint: "Name of the photographer or studio. Use \"In-house\" if shot by the practice — this is contractual, don't leave it blank or vague."
+
+      - label: "Image usage rights confirmed"
+        name: imageRightsConfirmed
+        widget: boolean
+        default: false
+        hint: >-
+          Leave this OFF until you've actually confirmed the practice holds
+          web usage rights for this image and the photographer credit above
+          matches the licence. The site will refuse to publish this project
+          without it turned on — that's intentional, not a bug.
+
+      - label: "Awards"
+        name: awards
+        widget: list
+        required: false
+        hint: "One line per award, e.g. PAM Award 2025 — Gold"
+
+      - label: "Publications"
+        name: publications
+        widget: list
+        required: false
+        fields:
+          - { label: "Title", name: title, widget: string }
+          - { label: "Publisher", name: publisher, widget: string, required: false }
+          - { label: "Date (free text, e.g. March 2024)", name: date, widget: string, required: false }
+          - { label: "Link", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
+
+      - label: "Project team"
+        name: team
+        widget: list
+        required: false
+
+      - label: "Consultants"
+        name: consultants
+        widget: list
+        required: false
+
+      - label: "Show on homepage (Selected Works)"
+        name: featured
+        widget: boolean
+        default: false
+        hint: "Only projects with this turned ON appear in the Selected Works section."
+
+      - label: "Sort order"
+        name: order
+        widget: number
+        value_type: int
+        default: 999
+        hint: "Lower numbers appear first. Leave as-is unless you want to control the order."
+
+      - label: "Draft"
+        name: draft
+        widget: boolean
+        default: true
+        hint: >-
+          Stays ON while you're still working on this project — the live
+          site can never show a draft. Turn it OFF only once every field
+          above is genuinely complete and correct.
+
+      - label: "Project description (long-form)"
+        name: body
+        widget: markdown
+        required: false
+        hint: "The main descriptive copy for this project."
+
+  # ===========================================================================
+  # AWARDS & RECOGNITION  →  src/content/press/*.md, kind: award
+  # ===========================================================================
+  - name: press_awards
+    label: "Awards & Recognition"
+    label_singular: "Award"
+    folder: "src/content/press"
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{fields.title}}"
+    summary: "{{title}} — {{source}}"
+    filter: { field: kind, value: award }
+    fields:
+      - { label: "Title", name: title, widget: string, required: true }
+      - { label: "Kind", name: kind, widget: hidden, default: award }
+      - { label: "Awarding body", name: source, widget: string, required: true }
+      - { label: "Date", name: date, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Date note (use instead of Date for imprecise dates, e.g. Vol.36 Issue 1, 2024)", name: dateNote, widget: string, required: false }
+      - { label: "Link", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
+      - { label: "Related project (optional, your own reference)", name: project, widget: string, required: false }
+      - { label: "Show on homepage", name: featured, widget: boolean, default: false }
+      - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
+
+  # ===========================================================================
+  # NEWS & PRESS — ARTICLES  →  src/content/press/*.md, kind: publication
+  # ===========================================================================
+  - name: press_publications
+    label: "News & Press — Articles"
+    label_singular: "Article"
+    folder: "src/content/press"
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{fields.title}}"
+    summary: "{{title}} — {{source}}"
+    filter: { field: kind, value: publication }
+    fields:
+      - { label: "Title", name: title, widget: string, required: true }
+      - { label: "Kind", name: kind, widget: hidden, default: publication }
+      - { label: "Publication", name: source, widget: string, required: true }
+      - { label: "Date", name: date, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Date note (use instead of Date for imprecise dates)", name: dateNote, widget: string, required: false }
+      - { label: "Link to coverage", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
+      - { label: "Related project (optional, your own reference)", name: project, widget: string, required: false }
+      - { label: "Show on homepage", name: featured, widget: boolean, default: false }
+      - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
+
+  # ===========================================================================
+  # NEWS & PRESS — TALKS  →  src/content/press/*.md, kind: speaking
+  # ===========================================================================
+  - name: press_speaking
+    label: "News & Press — Talks"
+    label_singular: "Speaking engagement"
+    folder: "src/content/press"
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{fields.title}}"
+    summary: "{{title}} — {{source}}"
+    filter: { field: kind, value: speaking }
+    fields:
+      - { label: "Title", name: title, widget: string, required: true }
+      - { label: "Kind", name: kind, widget: hidden, default: speaking }
+      - { label: "Event / organiser", name: source, widget: string, required: true }
+      - { label: "Date", name: date, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Date note (use instead of Date for imprecise dates)", name: dateNote, widget: string, required: false }
+      - { label: "Link", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
+      - { label: "Related project (optional, your own reference)", name: project, widget: string, required: false }
+      - { label: "Show on homepage", name: featured, widget: boolean, default: false }
+      - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
+
+  # ===========================================================================
+  # EXHIBITIONS  →  src/content/press/*.md, kind: exhibition
+  # No entries exist yet — this is where the first ones get added.
+  # ===========================================================================
+  - name: press_exhibitions
+    label: "Exhibitions"
+    label_singular: "Exhibition"
+    folder: "src/content/press"
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{fields.title}}"
+    summary: "{{title}} — {{source}}"
+    filter: { field: kind, value: exhibition }
+    fields:
+      - { label: "Title", name: title, widget: string, required: true }
+      - { label: "Kind", name: kind, widget: hidden, default: exhibition }
+      - { label: "Venue", name: source, widget: string, required: true }
+      - { label: "Date", name: date, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Date note (use instead of Date for imprecise dates)", name: dateNote, widget: string, required: false }
+      - { label: "Link", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
+      - { label: "Related project (optional, your own reference)", name: project, widget: string, required: false }
+      - { label: "Show on homepage", name: featured, widget: boolean, default: false }
+      - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
+
+  # ===========================================================================
+  # ART MUSEUMS  →  src/content/press/*.md, kind: museum
+  # No entries exist yet — this is where the first ones get added.
+  # ===========================================================================
+  - name: press_museums
+    label: "Art Museums"
+    label_singular: "Museum entry"
+    folder: "src/content/press"
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{fields.title}}"
+    summary: "{{title}} — {{source}}"
+    filter: { field: kind, value: museum }
+    fields:
+      - { label: "Title", name: title, widget: string, required: true }
+      - { label: "Kind", name: kind, widget: hidden, default: museum }
+      - { label: "Museum", name: source, widget: string, required: true }
+      - { label: "Date", name: date, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Date note (use instead of Date for imprecise dates)", name: dateNote, widget: string, required: false }
+      - { label: "Link", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
+      - { label: "Related project (optional, your own reference)", name: project, widget: string, required: false }
+      - { label: "Show on homepage", name: featured, widget: boolean, default: false }
+      - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
+
+  # ===========================================================================
+  # BOOKS + IDEAS  →  src/content/press/*.md, kind: book
+  # No entries exist yet — this is where the first ones get added.
+  # ===========================================================================
+  - name: press_books
+    label: "Books + Ideas"
+    label_singular: "Book / idea"
+    folder: "src/content/press"
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{fields.title}}"
+    summary: "{{title}} — {{source}}"
+    filter: { field: kind, value: book }
+    fields:
+      - { label: "Title", name: title, widget: string, required: true }
+      - { label: "Kind", name: kind, widget: hidden, default: book }
+      - { label: "Publisher / source", name: source, widget: string, required: true }
+      - { label: "Date", name: date, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Date note (use instead of Date for imprecise dates)", name: dateNote, widget: string, required: false }
+      - { label: "Link", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
+      - { label: "Related project (optional, your own reference)", name: project, widget: string, required: false }
+      - { label: "Show on homepage", name: featured, widget: boolean, default: false }
+      - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>DTLM Architect — Content admin</title>
+  </head>
+  <body>
+    <!--
+      Content admin for DTLM Architect.
+
+      Sveltia CMS — a git-based headless CMS. Reads/writes the exact same
+      Markdown files in src/content/ that the Astro build already validates
+      against src/content.config.ts. There is no separate database: saving
+      here commits directly to this repo, and the existing Cloudflare Pages
+      git integration builds and deploys it exactly as any other commit would.
+
+      Version is pinned deliberately, not @latest — an upstream release
+      should never silently change behavior under a non-technical editor.
+      Bump it manually if a newer version is wanted.
+    -->
+    <script src="https://unpkg.com/@sveltia/cms@0.193.1/dist/sveltia-cms.js" type="module"></script>
+  </body>
+</html>

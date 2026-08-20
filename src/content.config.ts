@@ -92,8 +92,15 @@ const projects = defineCollection({
           message: `typology must be one of: ${TYPOLOGIES.join(' | ')}`,
         }),
 
-        /** Gross floor area in square metres. */
-        area: z.number().positive().optional(),
+        /**
+         * Gross floor area in square metres. `.nullable()` alongside
+         * `.optional()` is deliberate: the CMS's number widget writes an
+         * explicit `null` into frontmatter when left empty (not a missing
+         * key), so both must mean "not specified" here — this doesn't
+         * accept anything a plain `.optional()` wouldn't already permit in
+         * spirit, it just also accepts the literal value the CMS produces.
+         */
+        area: z.number().positive().optional().nullable(),
 
         /** Short summary used on cards and in meta description. */
         description: z

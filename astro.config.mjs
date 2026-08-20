@@ -19,6 +19,33 @@ import { SITE } from './src/consts.js';
 const GH_PAGES = process.env.GITHUB_PAGES === 'true';
 const GH_PAGES_REPO = 'dtlm-website';
 
+/**
+ * Dev-only fix for a real, currently-open Astro bug: index.html files in a
+ * public/ subfolder aren't served at their directory path by `astro dev` —
+ * only the exact /admin/index.html works, not /admin or /admin/
+ * (https://github.com/withastro/astro/issues/14800). This never affects
+ * `astro build`/`astro preview` or the real Cloudflare Pages deploy, both of
+ * which already serve /admin/ correctly (verified) — it only rewrites the
+ * request Vite's own static-file middleware sees during local development,
+ * so /admin/config.yml (loaded by the CMS relative to /admin/) still
+ * resolves correctly either way.
+ */
+function adminDevFallback() {
+  return {
+    name: 'admin-dev-fallback',
+    hooks: {
+      'astro:server:setup': ({ server }) => {
+        server.middlewares.use((req, _res, next) => {
+          if (req.url === '/admin' || req.url === '/admin/') {
+            req.url = '/admin/index.html';
+          }
+          next();
+        });
+      },
+    },
+  };
+}
+
 export default defineConfig({
   site: GH_PAGES ? `https://${process.env.GITHUB_REPOSITORY_OWNER}.github.io` : SITE.url,
   base: GH_PAGES ? `/${GH_PAGES_REPO}` : undefined,
@@ -36,7 +63,7 @@ export default defineConfig({
   },
 
   // Generates sitemap-index.xml at build time for Google Search Console (§9.7).
-  integrations: [sitemap()],
+  integrations: [sitemap(), adminDevFallback()],
 
   i18n: {
     defaultLocale: 'en',
