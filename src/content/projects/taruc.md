@@ -23,7 +23,7 @@ awards: []
 publications: []
 team: []
 consultants: []
-featured: false
+featured: true
 order: 999
 draft: false
 ---
