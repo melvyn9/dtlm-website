@@ -95,7 +95,6 @@ import { withBase } from '../lib/url';
   <div class="wrap site-header__inner">
     <a class="site-header__brand" href={withBase('/')}>
       <span class="site-header__name"><span class="site-header__name-mark">D</span>TLM</span>
-      <span class="site-header__tagline">{SITE.tagline}</span>
     </a>
 
     <!--
@@ -211,13 +210,6 @@ import { withBase } from '../lib/url';
 
   .site-header__name-mark {
     color: var(--brand-mark);
-  }
-
-  .site-header__tagline {
-    display: block;
-    font-size: var(--step--1);
-    color: var(--ink-faint);
-    margin-block-start: var(--space-3xs);
   }
 
   /* ===================================================================

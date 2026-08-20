@@ -4,8 +4,8 @@ The practice website for DTLM Architect, Kuala Lumpur. It is a **static site**:
 there is no database and no server to maintain. Content lives in text files in
 this folder, and the site is rebuilt automatically whenever those files change.
 
-**Routine content edits — Selected Works, Awards & Recognition, News & Press,
-Exhibitions, Art Museums, Books + Ideas — don't need any of the below.** Log
+**Routine content edits — Selected Works, Awards & Recognition, News, Museums,
+Books — don't need any of the below.** Log
 into **`/admin/`** on the live site with your GitHub account and use the form.
 See [section 3](#3-how-to-add-a-new-project) and
 [section 5](#5-how-to-add-an-award-or-press-mention) for what that covers, and
@@ -182,22 +182,21 @@ To remove someone, either delete their file or set `draft: true`.
 
 ## 5. How to add an award or press mention
 
-This one collection of files backs **five different sections** on the
-homepage: Awards & Recognition, News & Press, Exhibitions, Art Museums, and
-Books + Ideas. Which section an item appears in is decided entirely by its
-`kind` field.
+This one collection of files backs **four different sections** on the
+homepage: Awards & Recognition, News, Museums, and Books. Which section an
+item appears in is decided entirely by its `kind` field.
 
 ### The easy way — the CMS
 
-Go to `/admin/` and sign in. In the sidebar you'll see the five sections
-listed separately — **Awards & Recognition**, **News & Press — Articles**,
-**News & Press — Talks**, **Exhibitions**, **Art Museums**, **Books + Ideas**.
-Open whichever matches, click **New**, and fill in the form. The CMS sets the
-right `kind` for you automatically — you'll never see that field.
+Go to `/admin/` and sign in. In the sidebar you'll see the four sections
+listed separately — **Awards & Recognition**, **News — Articles**,
+**News — Talks**, **Museums**, **Books**. Open whichever matches, click
+**New**, and fill in the form. The CMS sets the right `kind` for you
+automatically — you'll never see that field.
 
-Exhibitions, Art Museums, and Books + Ideas currently have no entries at all
-(they show "Coming soon." on the live site) — adding the first one there
-works exactly the same way as any other.
+Museums and Books currently have no entries at all (they show "Coming soon."
+on the live site) — adding the first one there works exactly the same way as
+any other.
 
 ### The manual way — editing files directly
 
@@ -217,8 +216,8 @@ featured: true
 
 | Field | Notes |
 |---|---|
-| `kind` | One of `award`, `publication`, `speaking`, `exhibition`, `museum`, `book`. Decides which homepage section it appears in — see the mapping below. |
-| `source` | The publication, awarding body, venue, or museum. |
+| `kind` | One of `award`, `publication`, `speaking`, `museum`, `book`. Decides which homepage section it appears in — see the mapping below. |
+| `source` | The publication, awarding body, or museum. |
 | `date` | Format `YYYY-MM-DD`. Optional — leave it out if you do not know it. |
 | `dateNote` | Use instead of `date` when only an issue is known, e.g. `"Vol.36, Issue 1, 2024"`. |
 | `url` | Link to the original coverage. Optional but strongly preferred. |
@@ -229,11 +228,10 @@ featured: true
 | `kind` | Section |
 |---|---|
 | `award` | Awards & Recognition |
-| `publication` | News & Press |
-| `speaking` | News & Press, under a "Speaking engagements" sub-heading |
-| `exhibition` | Exhibitions |
-| `museum` | Art Museums |
-| `book` | Books + Ideas |
+| `publication` | News |
+| `speaking` | News, under a "Speaking engagements" sub-heading |
+| `museum` | Museums |
+| `book` | Books |
 
 ---
 
@@ -740,8 +738,8 @@ src/
   content/team/          One Markdown file per person (Hero headshot only —
                           not surfaced elsewhere yet, not in the CMS)
   content/press/         One Markdown file per award/publication/talk/
-                          exhibition/museum/book — the `kind` field decides
-                          which homepage section it appears in
+                          museum/book — the `kind` field decides which
+                          homepage section it appears in
   assets/                Source images, processed at build time
 public/
   admin/                 Sveltia CMS — index.html + config.yml

@@ -118,7 +118,6 @@ export const NAV = [
   { href: '/#selected-works', key: 'nav.works' },
   { href: '/#awards', key: 'nav.awards' },
   { href: '/#news', key: 'nav.news' },
-  { href: '/#exhibitions', key: 'nav.exhibitions' },
   { href: '/#museums', key: 'nav.museums' },
   { href: '/#books', key: 'nav.books' },
   { href: '/#contact', key: 'nav.contact' },

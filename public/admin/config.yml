@@ -214,10 +214,10 @@ collections:
       - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
 
   # ===========================================================================
-  # NEWS & PRESS — ARTICLES  →  src/content/press/*.md, kind: publication
+  # NEWS — ARTICLES  →  src/content/press/*.md, kind: publication
   # ===========================================================================
   - name: press_publications
-    label: "News & Press — Articles"
+    label: "News — Articles"
     label_singular: "Article"
     folder: "src/content/press"
     create: true
@@ -238,10 +238,10 @@ collections:
       - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
 
   # ===========================================================================
-  # NEWS & PRESS — TALKS  →  src/content/press/*.md, kind: speaking
+  # NEWS — TALKS  →  src/content/press/*.md, kind: speaking
   # ===========================================================================
   - name: press_speaking
-    label: "News & Press — Talks"
+    label: "News — Talks"
     label_singular: "Speaking engagement"
     folder: "src/content/press"
     create: true
@@ -262,36 +262,11 @@ collections:
       - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
 
   # ===========================================================================
-  # EXHIBITIONS  →  src/content/press/*.md, kind: exhibition
-  # No entries exist yet — this is where the first ones get added.
-  # ===========================================================================
-  - name: press_exhibitions
-    label: "Exhibitions"
-    label_singular: "Exhibition"
-    folder: "src/content/press"
-    create: true
-    delete: true
-    identifier_field: title
-    slug: "{{fields.title}}"
-    summary: "{{title}} — {{source}}"
-    filter: { field: kind, value: exhibition }
-    fields:
-      - { label: "Title", name: title, widget: string, required: true }
-      - { label: "Kind", name: kind, widget: hidden, default: exhibition }
-      - { label: "Venue", name: source, widget: string, required: true }
-      - { label: "Date", name: date, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
-      - { label: "Date note (use instead of Date for imprecise dates)", name: dateNote, widget: string, required: false }
-      - { label: "Link", name: url, widget: string, required: false, pattern: ["^https?://.+", "Must start with http:// or https://"] }
-      - { label: "Related project (optional, your own reference)", name: project, widget: string, required: false }
-      - { label: "Show on homepage", name: featured, widget: boolean, default: false }
-      - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
-
-  # ===========================================================================
-  # ART MUSEUMS  →  src/content/press/*.md, kind: museum
+  # MUSEUMS  →  src/content/press/*.md, kind: museum
   # No entries exist yet — this is where the first ones get added.
   # ===========================================================================
   - name: press_museums
-    label: "Art Museums"
+    label: "Museums"
     label_singular: "Museum entry"
     folder: "src/content/press"
     create: true
@@ -312,11 +287,11 @@ collections:
       - { label: "Draft", name: draft, widget: boolean, default: true, hint: "Stays ON while incomplete — excluded from the live site until turned OFF." }
 
   # ===========================================================================
-  # BOOKS + IDEAS  →  src/content/press/*.md, kind: book
+  # BOOKS  →  src/content/press/*.md, kind: book
   # No entries exist yet — this is where the first ones get added.
   # ===========================================================================
   - name: press_books
-    label: "Books + Ideas"
+    label: "Books"
     label_singular: "Book / idea"
     folder: "src/content/press"
     create: true

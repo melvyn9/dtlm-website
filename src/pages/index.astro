@@ -36,7 +36,6 @@ const principal = (await getTeam()).find((m) => m.data.name === SITE.principal);
 const awardItems = press.filter((p) => p.data.kind === 'award');
 const publicationItems = press.filter((p) => p.data.kind === 'publication');
 const speakingItems = press.filter((p) => p.data.kind === 'speaking');
-const exhibitionItems = press.filter((p) => p.data.kind === 'exhibition');
 const museumItems = press.filter((p) => p.data.kind === 'museum');
 const bookItems = press.filter((p) => p.data.kind === 'book');
 ---
@@ -124,7 +123,6 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
     }
   </PressSection>
 
-  <PressSection id="exhibitions" heading={t['press.exhibitions']} items={exhibitionItems} />
   <PressSection id="museums" heading={t['press.museums']} items={museumItems} />
   <PressSection id="books" heading={t['press.books']} items={bookItems} />
 
