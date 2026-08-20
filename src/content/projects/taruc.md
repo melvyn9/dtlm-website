@@ -25,5 +25,5 @@ team: []
 consultants: []
 featured: false
 order: 999
-draft: true
+draft: false
 ---
