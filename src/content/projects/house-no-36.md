@@ -20,7 +20,7 @@ publications:
     date: Vol.36 Issue 1, 2024
 featured: true
 order: 3
-draft: true
+draft: false
 ---
 
 <!-- STUB — body copy not yet migrated from /portfolio/. See Phase 0 audit §6. -->

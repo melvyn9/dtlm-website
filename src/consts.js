@@ -19,7 +19,7 @@ export const SITE = {
    * this string appears in page titles, the footer, structured data and the
    * accessibility statement.
    */
-  name: 'DTLM Architect',
+  name: 'DrTanLM Architect (DTLMA)',
 
   /** Longer form used where the principal's credentials add weight. */
   legalName: 'DRTAN LM Architect',
