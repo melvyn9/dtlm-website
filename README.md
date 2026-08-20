@@ -93,9 +93,14 @@ browser updates by itself. Press `Ctrl+C` in the terminal to stop.
 3. Fill in the form and drag your image onto the **Hero image** field — see
    [section 6](#6-preparing-images) for what makes a good one, and
    [section 7](#7-how-to-write-good-alt-text) for the alt text field.
-4. Leave **Draft** turned on while you work. It only shows up on the live
+4. To show more than one photo, add them under **Additional gallery
+   images** — visitors can swipe or scroll through hero + gallery together
+   as one sequence in the project's popup. Drag entries by their handle to
+   reorder them; that's the order they appear in. Each one needs its own
+   alt text, held to the same standard as the hero image.
+5. Leave **Draft** turned on while you work. It only shows up on the live
    site once you turn it off.
-5. Click **Save**. That's it — no terminal, no Git. The CMS commits the file
+6. Click **Save**. That's it — no terminal, no Git. The CMS commits the file
    straight to the site's source, which redeploys automatically within a
    couple of minutes (see [section 8](#8-how-deployment-works)).
 
@@ -133,6 +138,7 @@ description. The template explains each field. The important ones:
 | `slug` | An internal id used for the project's popup on the page — no longer a real web address (the site is a single scrollable page now). Lowercase, hyphens, doesn't need to be exact. |
 | `year`, `location`, `status`, `typology` | All required. `status` and `typology` must be one of the listed values, spelled exactly. |
 | `heroImageAlt` | Required. See [section 7](#7-how-to-write-good-alt-text). |
+| `gallery` | Optional. Extra photos shown after the hero image in a swipeable gallery. List order is display order. Each entry's `alt` follows the exact same rules as `heroImageAlt`. |
 | `photographer` | Required. The photographer's name, or `In-house`. |
 | `imageRightsConfirmed` | Must be `true` before the project can go live. Only set this once you have actually checked. |
 | `featured` | `true` puts it on the homepage's Selected Works section — currently the only place projects appear. |
@@ -513,6 +519,7 @@ The error message names the file and the problem. The common ones:
 | `imageRightsConfirmed must be true` | Rights not yet checked | Confirm the rights, then set it to `true` |
 | `heroImageAlt repeats the project title` | Alt text is just the project name | Describe the building instead |
 | `heroImageAlt must describe...` (too short) | Under 15 characters | Write a fuller description |
+| `gallery image alt text...` | Same alt-text rules as above, but on one of the additional gallery images rather than the hero image | Same fixes — the message names which check failed |
 | `typology must be one of` | Misspelling, or a value not on the list | Use exactly: `residential`, `commercial`, `civic`, `institutional`, `interior` |
 | `status must be one of` | Same | Use exactly: `built`, `under-construction`, `competition`, `unbuilt` |
 | `slug must be lowercase letters...` | Capitals, spaces or underscores in the slug | Lowercase and hyphens only |

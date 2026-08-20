@@ -119,6 +119,26 @@ collections:
           (screen readers already announce that it's an image), and don't
           just repeat the title — the build will reject both.
 
+      - label: "Additional gallery images (optional — shown after the hero image in a swipeable gallery)"
+        name: gallery
+        widget: list
+        required: false
+        summary: "{{fields.alt}}"
+        hint: "Drag entries by their handle (⠿) to reorder — this sets the order images appear in."
+        fields:
+          - label: "Image"
+            name: image
+            widget: image
+            required: true
+            media_folder: "../../assets/projects"
+            public_folder: "../../assets/projects"
+          - label: "Alt text"
+            name: alt
+            widget: text
+            required: true
+            pattern: ["^[\\s\\S]{15,}$", "At least 15 characters"]
+            hint: "Describe what's in this specific photo — same rules as the hero image alt text above."
+
       - label: "Photographer"
         name: photographer
         widget: string

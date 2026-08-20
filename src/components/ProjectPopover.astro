@@ -35,18 +35,41 @@ const details = [
 
 const popoverId = `project-${d.slug}`;
 const headingId = `${popoverId}-heading`;
+
+/**
+ * Hero image is slide 1; any gallery images follow, in the order the CMS's
+ * list widget has them (drag-reordered there — see public/admin/config.yml).
+ * A single-slide project (the common case today) renders with no carousel
+ * chrome at all — see the `slides.length > 1` guards below.
+ */
+const slides = [{ image: d.heroImage, alt: d.heroImageAlt }, ...d.gallery];
 ---
 
 <div popover="auto" id={popoverId} role="dialog" aria-modal="true" aria-labelledby={headingId} class="project-popover">
   <div class="project-popover__media">
-    <Image
-      src={d.heroImage}
-      alt={d.heroImageAlt}
-      widths={[500, 900, 1300]}
-      sizes="(max-width: 45rem) 90vw, 40rem"
-      loading="lazy"
-      format="avif"
-    />
+    <div
+      class="project-popover__track"
+      tabindex={slides.length > 1 ? 0 : undefined}
+      aria-label={slides.length > 1 ? `Project photos, ${slides.length} images` : undefined}
+    >
+      {
+        slides.map((slide, i) => (
+          <div class="project-popover__slide">
+            <Image
+              src={slide.image}
+              alt={slide.alt}
+              widths={[500, 900, 1300]}
+              sizes="(max-width: 45rem) 90vw, 40rem"
+              loading="lazy"
+              format="avif"
+            />
+            {slides.length > 1 && (
+              <span class="project-popover__count">{i + 1} / {slides.length}</span>
+            )}
+          </div>
+        ))
+      }
+    </div>
     <button type="button" popovertarget={popoverId} popovertargetaction="hide" class="project-popover__close">
       <span aria-hidden="true">&times;</span>
       <span class="visually-hidden">{t['project.close']}</span>
@@ -150,16 +173,61 @@ const headingId = `${popoverId}-heading`;
   .project-popover__media {
     position: sticky;
     top: 0;
-    background: var(--paper-sunk);
     aspect-ratio: 16 / 9;
     overflow: hidden;
   }
 
-  .project-popover__media :global(img) {
+  /*
+   * The actual scroller. Deliberately a separate element from
+   * .project-popover__media, not the thing .project-popover__close is
+   * positioned against — an absolutely positioned element still scrolls
+   * with its containing block's own overflow (position:absolute only
+   * exempts it from flex/grid *layout*, not from *scrolling*). Keeping the
+   * close button a sibling of .track, both children of the non-scrolling
+   * .project-popover__media, is what keeps it genuinely fixed in the corner
+   * regardless of how far the gallery is scrolled.
+   */
+  .project-popover__track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Scrollable region with no visible controls — must be reachable and
+     operable by keyboard alone (axe: scrollable-region-focusable). Once
+     focused, arrow keys scroll it natively in every major browser. tabindex
+     is only present at all when there's more than one slide (see the
+     component), so this rule only ever matches in that case. */
+  .project-popover__track:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: -4px;
+  }
+
+  .project-popover__slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    position: relative;
+    background: var(--paper-sunk);
+  }
+
+  .project-popover__slide :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  .project-popover__count {
+    position: absolute;
+    bottom: var(--space-s);
+    inset-inline-end: var(--space-s);
+    padding: var(--space-3xs) var(--space-2xs);
+    border-radius: 999px;
+    background: var(--scrim);
+    color: var(--paper);
+    font-size: var(--step--1);
   }
 
   .project-popover__close {

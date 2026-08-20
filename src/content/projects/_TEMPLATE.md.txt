@@ -43,6 +43,17 @@ heroImageAlt: >-
   # Do NOT start with "image of" or "photo of".
   # See the README for three worked examples.
 
+gallery: []
+  # Optional. Extra photos shown after the hero image in a swipeable
+  # gallery on the project's popover. Order here is display order.
+  # Each entry needs the same care as heroImage/heroImageAlt above — alt
+  # text follows the exact same rules (required, 15+ characters, no
+  # "photo of", no repeating the title). e.g.
+  # - image: ../../assets/projects/verandah-house-courtyard.jpg
+  #   alt: Courtyard seen from the covered walkway, timber screens filtering afternoon light
+  # - image: ../../assets/projects/verandah-house-interior.jpg
+  #   alt: Double-height living room opening onto the rear garden
+
 photographer: # REQUIRED. Name of the photographer or studio.
               # Use "In-house" if the practice shot it.
               # This is contractual — see the README.

@@ -134,6 +134,36 @@ const projects = defineCollection({
           ),
 
         /**
+         * Optional additional photos shown after heroImage in the project
+         * popover's carousel — see ProjectPopover.astro. Order in this array
+         * is the display order; the CMS's list widget reorders by drag.
+         *
+         * Alt text carries the same "no repeat title / no generic word /
+         * no 'photo of'" rigor as heroImageAlt — the repeat-title check
+         * needs `title`, so it lives in superRefine below; the other two
+         * don't need cross-field data, so they sit here, same as
+         * heroImageAlt's own field-level refinements above.
+         */
+        gallery: z
+          .array(
+            z.object({
+              image: image(),
+              alt: z
+                .string()
+                .min(15, 'gallery image alt text must describe the architectural subject, not just name it')
+                .refine(
+                  (v) => !/^\s*(an?\s+)?(image|photo|photograph|picture)\s+of\b/i.test(v),
+                  'gallery image alt text should not start with "image of" / "photo of"',
+                )
+                .refine(
+                  (v) => !LAZY_ALT.includes(normalise(v)),
+                  'gallery image alt text is too generic — describe what is actually in the frame',
+                ),
+            }),
+          )
+          .default([]),
+
+        /**
          * REQUIRED. Brief §6: "architectural photography is licensed, and
          * credit lines are typically contractual... This is a legal exposure,
          * not a nicety."
@@ -197,6 +227,19 @@ const projects = defineCollection({
           });
         }
 
+        // Same repeat-title rule for every gallery image — each is exactly
+        // as much a publish-time requirement as the hero image (§7).
+        data.gallery.forEach((item, i) => {
+          if (normalise(item.alt) === normalise(data.title)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['gallery', i, 'alt'],
+              message:
+                'gallery image alt text repeats the project title. Describe what is actually in this photo instead.',
+            });
+          }
+        });
+
         /**
          * Publication gate.
          *
@@ -219,6 +262,17 @@ const projects = defineCollection({
             });
           }
         }
+
+        data.gallery.forEach((item, i) => {
+          if (PLACEHOLDER.test(item.alt)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['gallery', i, 'alt'],
+              message:
+                'gallery image alt text still contains a placeholder. Fill it in, or set "draft: true" to keep this project out of the production build.',
+            });
+          }
+        });
 
         // §6: web usage rights are a legal exposure, not a nicety.
         if (!data.imageRightsConfirmed) {
