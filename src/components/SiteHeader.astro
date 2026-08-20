@@ -94,7 +94,7 @@ import { withBase } from '../lib/url';
 <header class="site-header">
   <div class="wrap site-header__inner">
     <a class="site-header__brand" href={withBase('/')}>
-      <span class="site-header__name">{SITE.name}</span>
+      <span class="site-header__name"><span class="site-header__name-mark">D</span>TLM</span>
       <span class="site-header__tagline">{SITE.tagline}</span>
     </a>
 
@@ -204,8 +204,13 @@ import { withBase } from '../lib/url';
   .site-header__name {
     display: block;
     font-size: var(--step-1);
+    font-weight: 700;
     letter-spacing: 0.02em;
     line-height: 1.1;
+  }
+
+  .site-header__name-mark {
+    color: var(--accent);
   }
 
   .site-header__tagline {
