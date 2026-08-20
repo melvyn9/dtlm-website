@@ -28,6 +28,7 @@
   --rule: #d9d9d2;         /* non-text borders only */
   --accent: #7a2f1d;       /* links / focus: 8.3:1 on --paper */
   --accent-hover: #57200f;
+  --brand-mark: #d62839;   /* header "D" only, large bold text: 4.8:1 on --paper */
   --focus-ring: #16160f;
   --scrim: rgba(12, 12, 8, 0.55); /* text-over-image backing (§7) */
 

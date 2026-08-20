@@ -20,6 +20,7 @@ const PALETTE = {
   rule: '#d9d9d2',
   accent: '#7a2f1d',
   'accent-hover': '#57200f',
+  'brand-mark': '#d62839',
 };
 
 /** Every text pair actually used in the templates. */
@@ -35,6 +36,12 @@ const PAIRS = [
   { fg: 'accent-hover', bg: 'paper', use: 'link hover', size: 'normal' },
   { fg: 'paper', bg: 'ink', use: 'skip link, inverted footer', size: 'normal' },
   { fg: 'paper', bg: 'accent', use: 'button label', size: 'normal' },
+  {
+    fg: 'brand-mark',
+    bg: 'paper',
+    use: 'header brand "D" — always bold at --step-1 (min 19.2px), qualifies as large text',
+    size: 'large',
+  },
 ];
 
 /**
