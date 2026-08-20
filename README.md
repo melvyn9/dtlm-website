@@ -1,12 +1,20 @@
 # DTLM Architect — website
 
 The practice website for DTLM Architect, Kuala Lumpur. It is a **static site**:
-there is no database, no CMS login, and no server to maintain. Content lives in
-text files in this folder, and the site is rebuilt automatically whenever those
-files change.
+there is no database and no server to maintain. Content lives in text files in
+this folder, and the site is rebuilt automatically whenever those files change.
 
-This document is written for a tech-savvy person who is not a developer. If you
-can edit a text file and use a web browser, you can maintain this site.
+**Routine content edits — Selected Works, Awards & Recognition, News & Press,
+Exhibitions, Art Museums, Books + Ideas — don't need any of the below.** Log
+into **`/admin/`** on the live site with your GitHub account and use the form.
+See [section 3](#3-how-to-add-a-new-project) and
+[section 5](#5-how-to-add-an-award-or-press-mention) for what that covers, and
+[section 10](#10-where-the-accounts-live) for how the login is set up.
+
+This document is written for a tech-savvy person who is not a developer, and
+covers everything the CMS doesn't: the technical fallback for editing files by
+hand, adding a team member, and how the site works underneath. If you can edit
+a text file and use a web browser, you can maintain this site either way.
 
 **Running cost: the domain renewal. Nothing else.**
 
@@ -78,54 +86,66 @@ browser updates by itself. Press `Ctrl+C` in the terminal to stop.
 
 ## 3. How to add a new project
 
-### Step 1 — prepare the image
+### The easy way — the CMS
 
-Read [section 6](#6-preparing-images) first. Save the finished image into:
+1. Go to `/admin/` on the live site and sign in with GitHub.
+2. Open **Selected Works** → **New Project**.
+3. Fill in the form and drag your image onto the **Hero image** field — see
+   [section 6](#6-preparing-images) for what makes a good one, and
+   [section 7](#7-how-to-write-good-alt-text) for the alt text field.
+4. Leave **Draft** turned on while you work. It only shows up on the live
+   site once you turn it off.
+5. Click **Save**. That's it — no terminal, no Git. The CMS commits the file
+   straight to the site's source, which redeploys automatically within a
+   couple of minutes (see [section 8](#8-how-deployment-works)).
 
-```
-src/assets/projects/
-```
+> **The site will refuse to publish an incomplete project even through the
+> CMS.** If you turn Draft off while alt text is unwritten, the photographer
+> is unconfirmed, or image rights aren't ticked, the deploy fails rather than
+> publishing something wrong. Check the practice's GitHub repository's
+> **Actions** tab if a save doesn't seem to have taken effect — see
+> [section 12](#12-if-the-build-fails).
 
-Name it after the project, in lowercase with hyphens: `verandah-house.jpg`
+The **Technical ID** field the CMS shows is just an internal label the page
+uses to identify the project's popup — it isn't a real web address the way it
+used to be, so don't worry about getting it perfect.
 
-### Step 2 — copy the template
+### The manual way — editing files directly
 
-In `src/content/projects/` you will find `_TEMPLATE.md.txt`.
+Useful if the CMS is unavailable, or you're comfortable with a text editor and
+Git and would rather work that way. Produces the exact same file the CMS
+would.
 
-Copy it, and rename the copy to match your project — **ending in `.md`, not
-`.md.txt`**:
+**Step 1 — prepare the image.** Read [section 6](#6-preparing-images) first.
+Save the finished image into `src/assets/projects/`, named after the project
+in lowercase with hyphens: `verandah-house.jpg`
 
-```
-src/content/projects/verandah-house.md
-```
+**Step 2 — copy the template.** In `src/content/projects/` you will find
+`_TEMPLATE.md.txt`. Copy it, and rename the copy to match your project —
+**ending in `.md`, not `.md.txt`**: `src/content/projects/verandah-house.md`
 
-### Step 3 — fill it in
-
-Open your new file. Everything between the two `---` lines at the top is the
-project's information. Everything below is the project's written description.
-
-The template explains each field. The important ones:
+**Step 3 — fill it in.** Everything between the two `---` lines at the top is
+the project's information. Everything below is the project's written
+description. The template explains each field. The important ones:
 
 | Field | Notes |
 |---|---|
-| `slug` | Becomes the URL: `verandah-house` → `dtlm.com.my/portfolio/verandah-house/`. **If the project already exists on the old site, use exactly the same slug** — changing it breaks the link and loses its Google ranking. |
+| `slug` | An internal id used for the project's popup on the page — no longer a real web address (the site is a single scrollable page now). Lowercase, hyphens, doesn't need to be exact. |
 | `year`, `location`, `status`, `typology` | All required. `status` and `typology` must be one of the listed values, spelled exactly. |
 | `heroImageAlt` | Required. See [section 7](#7-how-to-write-good-alt-text). |
 | `photographer` | Required. The photographer's name, or `In-house`. |
 | `imageRightsConfirmed` | Must be `true` before the project can go live. Only set this once you have actually checked. |
-| `featured` | `true` puts it on the homepage. |
+| `featured` | `true` puts it on the homepage's Selected Works section — currently the only place projects appear. |
 | `order` | Lower numbers appear first. |
 | `draft` | `true` while you are still working. Set to `false` to publish. |
 
-### Step 4 — preview it
+**Step 4 — preview it.** With `npm run dev` running, visit
+<http://localhost:4321/> — your project should be in the Selected Works
+section (if `featured: true`).
 
-With `npm run dev` running, visit <http://localhost:4321/works/>. Your project
-should be there.
-
-### Step 5 — publish it
-
-Work through the [pre-publication checklist](#11-pre-publication-checklist),
-then change `draft: true` to `draft: false`, save, and follow
+**Step 5 — publish it.** Work through the
+[pre-publication checklist](#11-pre-publication-checklist), then change
+`draft: true` to `draft: false`, save, and follow
 [section 8](#8-how-deployment-works).
 
 > **The site will refuse to build if a project is incomplete.** If you set
@@ -137,7 +157,13 @@ then change `draft: true` to `draft: false`, save, and follow
 
 ## 4. How to add a team member
 
-Exactly the same pattern.
+**Not in the CMS** — this collection is edited by hand only, the same manual
+pattern as section 3's fallback method. Also worth knowing: the homepage
+currently only ever shows the principal's headshot and name (pulled onto the
+Hero section by matching `SITE.principal` in `src/consts.js`) — there's no
+standalone team page anymore, so adding someone here doesn't put them
+anywhere on the live site yet. That's a placeholder for future work, not a
+bug.
 
 1. Save a headshot into `src/assets/team/` — square crop, max 1200px, under
    500KB. Name it `firstname-lastname.jpg`.
@@ -156,6 +182,25 @@ To remove someone, either delete their file or set `draft: true`.
 
 ## 5. How to add an award or press mention
 
+This one collection of files backs **five different sections** on the
+homepage: Awards & Recognition, News & Press, Exhibitions, Art Museums, and
+Books + Ideas. Which section an item appears in is decided entirely by its
+`kind` field.
+
+### The easy way — the CMS
+
+Go to `/admin/` and sign in. In the sidebar you'll see the five sections
+listed separately — **Awards & Recognition**, **News & Press — Articles**,
+**News & Press — Talks**, **Exhibitions**, **Art Museums**, **Books + Ideas**.
+Open whichever matches, click **New**, and fill in the form. The CMS sets the
+right `kind` for you automatically — you'll never see that field.
+
+Exhibitions, Art Museums, and Books + Ideas currently have no entries at all
+(they show "Coming soon." on the live site) — adding the first one there
+works exactly the same way as any other.
+
+### The manual way — editing files directly
+
 Create a new file in `src/content/press/`. Name it after the item, e.g.
 `pam-gold-medal-2025.md`. It only needs the header block:
 
@@ -172,12 +217,23 @@ featured: true
 
 | Field | Notes |
 |---|---|
-| `kind` | One of `award`, `publication`, `speaking`. This decides which section of the News & Press page it appears in. |
-| `source` | The publication or awarding body. |
+| `kind` | One of `award`, `publication`, `speaking`, `exhibition`, `museum`, `book`. Decides which homepage section it appears in — see the mapping below. |
+| `source` | The publication, awarding body, venue, or museum. |
 | `date` | Format `YYYY-MM-DD`. Optional — leave it out if you do not know it. |
 | `dateNote` | Use instead of `date` when only an issue is known, e.g. `"Vol.36, Issue 1, 2024"`. |
 | `url` | Link to the original coverage. Optional but strongly preferred. |
 | `featured` | `true` also shows it on the homepage. |
+
+`kind` → homepage section:
+
+| `kind` | Section |
+|---|---|
+| `award` | Awards & Recognition |
+| `publication` | News & Press |
+| `speaking` | News & Press, under a "Speaking engagements" sub-heading |
+| `exhibition` | Exhibitions |
+| `museum` | Art Museums |
+| `book` | Books + Ideas |
 
 ---
 
@@ -274,10 +330,20 @@ building, rewrite it.
 
 ## 8. How deployment works
 
-The site is hosted on **Cloudflare Pages** and deploys automatically from
-GitHub. You never upload files by hand.
+Every change — whether saved through the CMS or pushed by hand — lands on
+this repository's `main` branch on GitHub. From there, deployment is
+automatic. You never upload files by hand either way.
 
-### To publish your changes
+> **Current status (keep this updated):** the intended production host is
+> **Cloudflare Pages**, connected to `main`, serving `dtlm.com.my` — that is
+> what the rest of this section describes. As of this writing that connection
+> has **not been made yet**; the only deployment actually building from
+> `main` today is an internal-only **GitHub Pages** preview
+> (`.github/workflows/gh-pages.yml`), used for showing people how the site
+> looks before it's really live. Update this note once Cloudflare Pages is
+> connected — see [section 10](#10-where-the-accounts-live).
+
+### To publish a change by hand (skip this if you used the CMS)
 
 ```bash
 git add .
@@ -285,10 +351,12 @@ git commit -m "Add Verandah House project"
 git push
 ```
 
-That is it. Cloudflare notices the push, rebuilds the site, and publishes it —
-usually within two minutes.
+That is it. Whichever deployment is connected notices the push, rebuilds the
+site, and publishes it — usually within two minutes.
 
 ### How to confirm it worked
+
+**Once Cloudflare Pages is connected:**
 
 1. Go to the **Cloudflare dashboard → Workers & Pages → the site → Deployments**.
 2. The newest deployment should say **Success**. A build takes 1–2 minutes.
@@ -301,7 +369,13 @@ usually within two minutes.
      site down.
 3. Check the page on a phone as well as a laptop.
 
-### Preview deployments
+**Today, with only the GitHub Pages preview connected:** go to the
+repository's **Actions** tab on GitHub. The newest "Deploy preview to GitHub
+Pages" run should show a green check — same idea, same failure behavior, just
+a different dashboard. It publishes to the practice's `github.io` preview
+URL, not `dtlm.com.my`.
+
+### Preview deployments (once Cloudflare Pages is connected)
 
 Pushing to any branch other than `main` gives you a private preview URL without
 touching the live site. Useful for showing the practice a draft before it goes
@@ -320,7 +394,7 @@ Cloudflare comments the preview URL on the branch.
 
 Something went live that should not have. Two ways to fix it, fastest first.
 
-### Option A — instant rollback in Cloudflare (seconds)
+### Option A — instant rollback in Cloudflare (seconds, once connected)
 
 1. Cloudflare dashboard → Workers & Pages → the site → **Deployments**.
 2. Find the last deployment that was good.
@@ -329,7 +403,9 @@ Something went live that should not have. Two ways to fix it, fastest first.
 
 The live site reverts immediately. **Note:** this does not change the files in
 this folder — the next `git push` will deploy them again. Use option B to fix
-the underlying cause.
+the underlying cause. (Until Cloudflare Pages is connected — see
+[section 8](#8-how-deployment-works) — there is no equivalent instant
+rollback; go straight to option B.)
 
 ### Option B — undo the change properly
 
@@ -367,10 +443,14 @@ the one person who knew where everything lived moves on.
 
 | What | Provider | Account holder | Who has access | Notes |
 |---|---|---|---|---|
-| Domain `dtlm.com.my` | MYNIC (`.com.my` registry) | *[TO CONFIRM]* | | Registrant must be verified via MYNIC WHOIS — `.com.my` is not administered by global registrars |
+| Domain `dtlm.com.my` | MYNIC (`.com.my` registry) | *[TO CONFIRM]* | | Registrant must be verified via MYNIC WHOIS — `.com.my` is not administered by global registrars. Currently still points at the old site |
 | DNS | **MSC Hosting** (`ns101/ns102.mschosting.com`) | *[TO CONFIRM]* | | Confirmed by lookup, Aug 2026. May sit with a third-party web developer rather than the practice |
-| Source code | GitHub | *[TO CONFIRM]* | | |
-| Hosting / build | Cloudflare Pages | *[TO CONFIRM]* | | Free tier |
+| Source code | GitHub — `github.com/melvyn9/dtlm-website` | melvyn9 | Anyone added as a **Write** collaborator on the repo | Public repository |
+| Content editing (CMS) | Sveltia CMS at `/admin/`, no separate account — signs in with your GitHub login | Same as source code access | Same as source code access | Anyone who can edit content must be a repo collaborator with **Write** access — logging in alone isn't enough |
+| CMS login backend | GitHub OAuth App (`GitHub → Settings → Developer settings → OAuth Apps`) | melvyn9 | | Lets the CMS ask GitHub to verify who's logging in. Holds a Client ID and Client Secret |
+| CMS login backend (hosting) | Cloudflare Worker, `sveltia-cms-auth`, at `sveltia-cms-auth.melvyn9.workers.dev` | melvyn9 | | Deployed from `github.com/sveltia/sveltia-cms-auth` (not part of this repo). Holds the OAuth App's Client ID/Secret as Worker secrets, and an `ALLOWED_DOMAINS` list restricting which sites may use it |
+| Hosting / build (preview) | **GitHub Pages** — `melvyn9.github.io/dtlm-website/` | melvyn9 | | Internal preview only, not the real domain. Auto-deploys on every push to `main` via `.github/workflows/gh-pages.yml` |
+| Hosting / build (production) | Cloudflare Pages | *[TO CONFIRM]* | | **Not yet connected** — see [section 8](#8-how-deployment-works). Intended to serve `dtlm.com.my` from this repo's `main` branch. Free tier |
 | Contact form | Web3Forms | *[TO CONFIRM]* | | Access key is in `src/consts.js` |
 | Analytics | Cloudflare Web Analytics | *[TO CONFIRM]* | | Cookieless — no consent banner needed |
 
@@ -417,8 +497,14 @@ Run through this before setting `draft: false` on anything.
 
 ## 12. If the build fails
 
-**A failed build cannot break the live site.** The previous version stays up.
-Take your time.
+**A failed build cannot break the live site.** The previous version stays up
+— whether the change came from the CMS or a manual push. Take your time.
+
+**Where to look:** if a CMS save doesn't seem to have taken effect after a
+couple of minutes, check the repository's **Actions** tab on GitHub (or the
+Cloudflare Pages **Deployments** tab, once that's connected — see
+[section 8](#8-how-deployment-works)) for a failed run, and open it to read
+the error.
 
 The error message names the file and the problem. The common ones:
 
@@ -433,6 +519,7 @@ The error message names the file and the problem. The common ones:
 | `status must be one of` | Same | Use exactly: `built`, `under-construction`, `competition`, `unbuilt` |
 | `slug must be lowercase letters...` | Capitals, spaces or underscores in the slug | Lowercase and hyphens only |
 | `Could not find requested image` | Filename in the file does not match the file on disk | Check spelling and extension — `.jpg` and `.JPG` are different |
+| `Expected type "number", received "object"` | A number field (e.g. `area`) was left blank through the CMS, which saves that as `null` rather than leaving it out | Already handled for `area` in the schema (`.nullable()`). If it happens on a different number field, ask your developer to add `.nullable()` there too |
 
 If the message is not on this list, copy the whole thing into an email to your
 developer. It names the file and line.
@@ -441,15 +528,85 @@ developer. It names the file and line.
 
 ## 13. For developers
 
-### Stack
+### How the site fits together
+
+The site is one build pipeline with two front doors — a visitor's browser,
+and the CMS at `/admin/` — that both end up producing the same thing: plain
+Markdown files that [Astro](https://astro.build) turns into static HTML.
+There is no runtime backend and no database anywhere in this picture.
+
+```
+                                 ┌─────────────────────────┐
+  Editor (browser)               │  GitHub — melvyn9/dtlm-website │
+  ───────────────                │  main branch, source of truth  │
+  /admin/ (Sveltia CMS)  ──login──▶│  Markdown + images in src/     │
+       │        via a small        └────────────┬────────────────┘
+       │   Cloudflare Worker                     │ push triggers
+       │  (OAuth token exchange,                 ▼
+       │   sveltia-cms-auth,           ┌───────────────────────┐
+       │   deployed separately)        │  Astro build           │
+       └──── commits land on ─────────▶│  content.config.ts     │
+             main via GitHub's API     │  (Zod schema — the     │
+                                        │   real content gate)   │
+                                        └───────────┬────────────┘
+                                                     ▼
+                                        ┌───────────────────────┐
+                                        │  Static HTML/CSS files │
+                                        │  deployed to:          │
+                                        │  • GitHub Pages        │
+                                        │    (internal preview)  │
+                                        │  • Cloudflare Pages     │
+                                        │    (production —       │
+                                        │    not yet connected)  │
+                                        └───────────┬────────────┘
+                                                     ▼
+                                              Site visitors
+```
+
+- **[Astro](https://astro.build) 7** is the frontend framework — it reads the
+  Markdown content at build time and generates plain HTML/CSS pages. Nothing
+  runs on a server per-visit; every page is a pre-built file. This is also
+  what makes the "works with JavaScript disabled" requirement (below)
+  achievable rather than aspirational — there's no client-side rendering to
+  fall back from.
+- **Content collections + Zod** (`src/content.config.ts`) are the schema
+  every project/press/team entry is checked against at build time. This is
+  the one real gate in the whole system — see
+  [section 12](#12-if-the-build-fails) and
+  [the draft mechanism](#the-draft-mechanism) below.
+- **[Sveltia CMS](https://sveltiacms.app)** is the form-based editing screen
+  at `/admin/` (`public/admin/index.html` + `config.yml`). It's a
+  client-side app loaded from a CDN — no build step, no server of its own —
+  that reads and writes the *exact same* Markdown files a developer would
+  edit by hand, through GitHub's API. It does not weaken the Zod schema; see
+  the comments at the top of `public/admin/config.yml` for exactly what it
+  does and doesn't mirror.
+- **GitHub** is both the source-code host and the CMS's storage backend —
+  every CMS save is a real Git commit to `main`, visible in normal `git log`
+  history alongside hand-written commits.
+- **A Cloudflare Worker** (deployed separately, from
+  [`sveltia/sveltia-cms-auth`](https://github.com/sveltia/sveltia-cms-auth),
+  not part of this repository) handles the "Sign in with GitHub" OAuth
+  handshake — the one piece of infrastructure that exists purely so the CMS
+  can prove who's logging in. See [section 10](#10-where-the-accounts-live).
+- **Hosting**: static files are deployed to GitHub Pages today (internal
+  preview only) and are intended for Cloudflare Pages in production — see
+  [section 8](#8-how-deployment-works) for current status.
+- **Web3Forms** handles the contact form as a plain HTML POST — no JavaScript
+  fetch call, no form backend of our own.
+- **Cloudflare Web Analytics** is cookieless, injected at the edge, so no
+  consent banner is needed.
 
 | | |
 |---|---|
-| Generator | [Astro](https://astro.build) 7, static output |
+| Frontend / generator | [Astro](https://astro.build) 7, static output |
 | Content | Markdown with frontmatter, validated by Zod content collections |
+| Content editing | [Sveltia CMS](https://sveltiacms.app) at `/admin/`, git-backed |
+| CMS login | GitHub OAuth via a Cloudflare Worker (`sveltia-cms-auth`) |
 | Images | Astro's build-time pipeline → AVIF/WebP with responsive `srcset` |
 | Fonts | Inter Variable, self-hosted via `@fontsource-variable` — no CDN call |
-| Hosting | Cloudflare Pages |
+| Hosting (preview) | GitHub Pages |
+| Hosting (production) | Cloudflare Pages — not yet connected |
 | Forms | Web3Forms, plain HTML POST |
 | Analytics | Cloudflare Web Analytics (cookieless) |
 
@@ -471,8 +628,10 @@ These come from the project brief and are deliberate, not accidental:
 
 ### The mobile navigation
 
-The full-screen mobile menu contains no JavaScript. It is worth understanding
-before changing it, because the structure is not the obvious one.
+The full-screen mobile menu is built almost entirely without JavaScript. It is
+worth understanding before changing it, because the structure is not the
+obvious one — and because it now carries the site's only JavaScript, added
+deliberately and narrowly (see the end of this section).
 
 A `<details>` element in the header holds **only the toggle button**. The
 navigation links are a **sibling** `<nav id="primary-nav">`, and `:has()`
@@ -491,22 +650,51 @@ those browsers. This was verified in a real browser, not assumed: the nested
 version produced links with correct computed styles, zero layout height, and no
 reachable navigation at any desktop width.
 
-Three consequences to preserve if you touch this:
+Since the site became a single scrollable page, every NAV link is now a
+same-page `/#id` anchor rather than a separate route. That introduced two
+things worth knowing if you touch this:
 
-- **The overlay rules sit inside `@supports selector(html:has(body))`.** If a
-  browser cannot do `:has()`, the overlay could never open — so in that case
-  the navigation must *not* be hidden. Those browsers get links that wrap onto
-  a second line. Never trade requirement 1 for appearance.
-- **`<main>` and `<footer>` are set to `display: none` while the overlay is
-  open.** That is what keeps focus inside the overlay (WCAG 2.2 SC 2.4.11)
-  without a JavaScript focus trap. Removing it lets keyboard focus wander to
-  invisible content behind the menu.
+- **The header is sticky on mobile at all times**, not just while the overlay
+  is open — `.site-header { position: sticky; top: 0; }` under the mobile
+  media query, unconditionally. Originally added only while the overlay was
+  open (to stop a same-page anchor scroll carrying the close button off
+  screen with no way back), it's now a general "the menu toggle is always
+  reachable" feature. Not gated behind the `:has()` support check, since
+  plain `position: sticky` doesn't need it.
+- **`<main>` and `<footer>` are `visibility: hidden` while the overlay is
+  open — not `display: none`.** That still satisfies focus containment
+  (WCAG 2.2 SC 2.4.11), but *also* keeps their layout box intact, which
+  matters because a same-page anchor scroll needs somewhere real to land
+  even while the overlay covers it visually. `display: none` was tried
+  first and broke exactly this — the target section had nowhere to scroll
+  to, and the scroll silently failed with no way to recover once the
+  overlay closed.
 - **A `details` selector in a test or stylesheet now matches the nav toggle
   too**, and the header precedes `<main>` in the document. Scope to
-  `main details` when you mean a project panel.
+  `main details` (or, for project detail, `main [popover]` — see below) when
+  you mean something other than the nav toggle.
 
-`npm run check:nav` exercises all of this at 13 viewport widths with
-JavaScript disabled.
+**The one piece of JavaScript in the whole site** lives here too: a small
+inline `<script>` in `SiteHeader.astro` that closes the mobile overlay when a
+nav link is clicked. Without it the link still works — the overlay just
+needs a second tap on the toggle to close, which was the entire behavior
+before this was added. A pure-CSS alternative (`:target`-based auto-close)
+was tried and rejected: `:target` is a persistent match on the current URL
+fragment, not a one-time "just navigated" event, so it would have also
+permanently blocked the menu from ever reopening after the first link click.
+See the comment block at the top of `SiteHeader.astro` for the full
+reasoning.
+
+**Project detail is not `<details>` anymore either.** It moved from a
+separate page to a same-page popover (`ProjectPopover.astro`) using the
+native HTML **Popover API** (`popover="auto"` + `<button popovertarget>`) —
+also zero JavaScript, also declarative, and it satisfies "doesn't navigate to
+a different URL" for free since there's no URL change at all, not even a
+`#fragment`.
+
+`npm run check:nav` exercises the overlay at 13 viewport widths with
+JavaScript disabled — the one enhancement script above simply doesn't run in
+that mode, and the audit confirms the menu is still fully usable without it.
 5. **Target WCAG 2.2 Level AA.** Do not add a text colour without adding the
    pair to `scripts/check-contrast.mjs`.
 6. **Performance budget:** under 1MB first load, LCP under 2.5s on 4G.
@@ -540,21 +728,36 @@ src/
   content.config.ts      Zod schemas. The publish gate lives here
   i18n/en.js             All UI strings. Copy to ms.js to add Bahasa Malaysia
   lib/content.ts         Collection queries and draft filtering
+  lib/url.ts             withBase() — GitHub Pages preview subpath helper
   layouts/               BaseLayout — landmarks, skip link, meta
-  components/            SiteHeader, SiteFooter, ProjectCard, DraftNotice
-  pages/                 One file per route
-  content/projects/      One Markdown file per project
-  content/team/          One Markdown file per person
-  content/press/         One Markdown file per award / publication / talk
+  components/            SiteHeader (incl. the one enhancement script),
+                          SiteFooter, ProjectCard, ProjectPopover,
+                          PressSection, PressList, DraftNotice
+  pages/                 index.astro is almost the whole site now (a single
+                          scrollable page); a few standalone pages remain —
+                          accessibility, privacy, contact/thank-you, 404
+  content/projects/      One Markdown file per project — "Selected Works"
+  content/team/          One Markdown file per person (Hero headshot only —
+                          not surfaced elsewhere yet, not in the CMS)
+  content/press/         One Markdown file per award/publication/talk/
+                          exhibition/museum/book — the `kind` field decides
+                          which homepage section it appears in
   assets/                Source images, processed at build time
 public/
-  _redirects             Cloudflare Pages redirect map
-  robots.txt
+  admin/                 Sveltia CMS — index.html + config.yml
+  _redirects             Cloudflare Pages redirect map (301s from every
+                          retired page path to the relevant homepage anchor)
+  robots.txt             Disallows /admin/ from search indexing
 scripts/
   check-contrast.mjs     WCAG contrast validator
   a11y-audit.mjs         axe + no-JS + performance budget audit
   nav-responsive-audit.mjs  Mobile/desktop nav across 13 widths, JS disabled
 ```
+
+Note: the CMS's GitHub OAuth backend (`sveltia-cms-auth`) is **not** part of
+this repository — it's deployed separately from
+[`sveltia/sveltia-cms-auth`](https://github.com/sveltia/sveltia-cms-auth).
+See [section 10](#10-where-the-accounts-live).
 
 ### The draft mechanism
 
