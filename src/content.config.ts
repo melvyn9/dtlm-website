@@ -286,6 +286,48 @@ const projects = defineCollection({
       }),
 });
 
+/**
+ * Homepage hero image gallery. A singleton — exactly one file
+ * (src/content/hero/index.md) — edited via the CMS's file-collection UI
+ * rather than the folder-of-many-entries pattern projects/press use.
+ *
+ * No `draft` field and no placeholder-permitted state, unlike `projects`:
+ * there's no legitimate half-finished state for a simple image+alt pair —
+ * an entry is either real and complete, or not added yet. Empty `images: []`
+ * is the safe default (Hero renders text-only, same as before this existed).
+ */
+const hero = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/hero' }),
+  schema: ({ image }) =>
+    z.object({
+      images: z
+        .array(
+          z.object({
+            image: image(),
+            alt: z
+              .string()
+              .min(15, 'hero image alt text must describe what is in the photo')
+              .refine(
+                (v) => !/^\s*(an?\s+)?(image|photo|photograph|picture)\s+of\b/i.test(v),
+                'hero image alt text should not start with "image of" / "photo of"',
+              )
+              .refine(
+                (v) => !LAZY_ALT.includes(normalise(v)),
+                'hero image alt text is too generic — describe what is actually in the frame',
+              ),
+            // Visible on-screen label (e.g. a project name) shown as a
+            // caption over the photo — distinct from `alt`, which describes
+            // the photo's content for screen readers rather than naming the
+            // project. Optional: not every hero image is of a project (a
+            // portrait, say), and there's no accessibility gate on it the
+            // way there is on alt text.
+            caption: z.string().trim().min(1).optional(),
+          }),
+        )
+        .default([]),
+    }),
+});
+
 const team = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/team' }),
   schema: ({ image }) =>
@@ -345,4 +387,4 @@ const press = defineCollection({
   }),
 });
 
-export const collections = { projects, team, press };
+export const collections = { projects, team, press, hero };

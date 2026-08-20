@@ -55,6 +55,12 @@ export async function getPress() {
   });
 }
 
+/** Homepage hero gallery images, in display/cycle order. Empty if none set. */
+export async function getHero() {
+  const entry = (await getCollection('hero'))[0];
+  return entry?.data.images ?? [];
+}
+
 export type Project = CollectionEntry<'projects'>;
 export type TeamMember = CollectionEntry<'team'>;
 export type PressItem = CollectionEntry<'press'>;

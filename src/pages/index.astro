@@ -20,7 +20,7 @@ import ProjectPopover from '../components/ProjectPopover.astro';
 import PressSection from '../components/PressSection.astro';
 import PressList from '../components/PressList.astro';
 import DraftNotice from '../components/DraftNotice.astro';
-import { getProjects, getFeaturedProjects, getPress, getTeam } from '../lib/content';
+import { getProjects, getFeaturedProjects, getPress, getHero } from '../lib/content';
 import { CONTACT, FORM, SITE } from '../consts.js';
 import t from '../i18n/en.js';
 import { withBase } from '../lib/url';
@@ -31,7 +31,47 @@ const press = await getPress();
 const draftCount =
   allProjects.filter((p) => p.data.draft).length + press.filter((p) => p.data.draft).length;
 
-const principal = (await getTeam()).find((m) => m.data.name === SITE.principal);
+const heroImages = await getHero();
+
+/**
+ * Auto-advancing hero gallery — zero JavaScript.
+ *
+ * A single `translateX` @keyframes animation holds on each slide for
+ * HERO_DWELL_S, then slides to the next over HERO_TRANSITION_S. Percentage
+ * keyframe *selectors* can't be built from calc()/var() — they must be
+ * literal numbers — so unlike everything else here (duration, pause state),
+ * the @keyframes rule itself has to be generated as a string and injected
+ * via a raw <style set:html> block below, separate from the normal scoped
+ * <style> that holds the static track/slide/pause-control CSS.
+ *
+ * No explicit 100% stop is needed: CSS extends the last defined keyframe's
+ * value forward automatically, which conveniently holds the final slide
+ * steady until the animation loops. The loop restart (last slide → first)
+ * is an instant cut, not an animated slide-back — standard for this pattern,
+ * not a bug to design around.
+ */
+const HERO_DWELL_S = 5;
+const HERO_TRANSITION_S = 0.7;
+
+function heroKeyframes(n: number): string {
+  const seg = HERO_DWELL_S + HERO_TRANSITION_S;
+  const total = n * seg;
+  const pct = (s: number) => ((s / total) * 100).toFixed(4);
+  const stops: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const holdStart = i * seg;
+    const holdEnd = holdStart + HERO_DWELL_S;
+    stops.push(`${pct(holdStart)}% { transform: translateX(-${i * 100}%); }`);
+    stops.push(`${pct(holdEnd)}% { transform: translateX(-${i * 100}%); }`);
+    if (i < n - 1) {
+      stops.push(`${pct(holdStart + seg)}% { transform: translateX(-${(i + 1) * 100}%); }`);
+    }
+  }
+  return `@keyframes hero-slide { ${stops.join(' ')} }`;
+}
+
+const heroAnimated = heroImages.length > 1;
+const heroDuration = `${(heroImages.length * (HERO_DWELL_S + HERO_TRANSITION_S)).toFixed(2)}s`;
 
 const awardItems = press.filter((p) => p.data.kind === 'award');
 const publicationItems = press.filter((p) => p.data.kind === 'publication');
@@ -44,7 +84,43 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
   <DraftNotice count={draftCount} />
 
   <div class="wrap">
-    <section class={`intro section ${principal?.data.headshot ? 'intro--with-photo' : ''}`}>
+    <section class={`intro section ${heroImages.length > 0 ? 'intro--with-photo' : ''}`}>
+      {
+        heroImages.length > 0 && (
+          <div class="intro__media">
+            {heroAnimated && <input type="checkbox" id="hero-pause" class="visually-hidden" />}
+            <div
+              class={`intro__track ${heroAnimated ? 'intro__track--animated' : ''}`}
+              style={heroAnimated ? `animation-duration: ${heroDuration};` : undefined}
+            >
+              {heroImages.map((slide) => (
+                <div class="intro__slide">
+                  <Image
+                    src={slide.image}
+                    alt={slide.alt}
+                    widths={[600, 1000, 1600]}
+                    sizes="100vw"
+                    loading="eager"
+                    fetchpriority="high"
+                    format="avif"
+                  />
+                  {slide.caption && <p class="intro__caption">{slide.caption}</p>}
+                </div>
+              ))}
+            </div>
+            {heroAnimated && (
+              <label for="hero-pause" class="intro__pause">
+                <span class="intro__pause-icon intro__pause-icon--pause" aria-hidden="true">
+                  <span /><span />
+                </span>
+                <span class="intro__pause-icon intro__pause-icon--play" aria-hidden="true" />
+                <span class="visually-hidden">Pause automatic image rotation</span>
+              </label>
+            )}
+          </div>
+        )
+      }
+
       <div class="intro__text">
         <h1 class="intro__statement">
           An architectural practice in Kuala Lumpur, working across houses,
@@ -54,24 +130,14 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
           Led by {SITE.principal}, recipient of the PAM Gold Medal 2025.
         </p>
       </div>
-
-      {
-        principal?.data.headshot && principal.data.headshotAlt && (
-          <div class="intro__media">
-            <Image
-              src={principal.data.headshot}
-              alt={principal.data.headshotAlt}
-              widths={[400, 700, 900]}
-              sizes="(max-width: 55rem) 90vw, 32rem"
-              loading="eager"
-              fetchpriority="high"
-              format="avif"
-            />
-          </div>
-        )
-      }
     </section>
   </div>
+
+  {
+    heroAnimated && (
+      <style set:html={heroKeyframes(heroImages.length)} />
+    )
+  }
 
   {
     featured.length > 0 && (
@@ -261,24 +327,14 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
     max-width: 40ch;
   }
 
+  /*
+   * Always stacked — media on top spanning the section's full width, text
+   * below — not a side-by-side grid the way a single portrait used to sit.
+   * A full-width band reads oddly at a tall portrait crop, so the media
+   * aspect ratio is landscape (see .intro__media) rather than the old 4/5.
+   */
   .intro--with-photo {
-    display: grid;
-    gap: var(--space-xl) var(--space-2xl);
-    grid-template-columns: 1fr minmax(16rem, 26rem);
-    align-items: center;
     max-width: none;
-  }
-
-  @media (max-width: 55rem) {
-    .intro--with-photo {
-      grid-template-columns: 1fr;
-    }
-
-    /* Photo leads on narrow viewports so it reads as a portrait, not a
-       trailing afterthought below several paragraphs of text. */
-    .intro--with-photo .intro__media {
-      order: -1;
-    }
   }
 
   .intro__statement {
@@ -292,16 +348,160 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
     max-width: var(--measure);
   }
 
+  .intro__text {
+    max-width: var(--measure);
+    margin-block-start: var(--space-l);
+  }
+
+  /* With a hero image present, the text block matches the image's full
+     width and centers, rather than sitting at a left-aligned reading
+     measure — the image sets the layout's scale here, not body-copy
+     line-length conventions. */
+  .intro--with-photo .intro__text {
+    max-width: none;
+    text-align: center;
+  }
+
+  .intro--with-photo .intro__lede {
+    max-width: none;
+  }
+
   .intro__media {
+    position: relative;
     background: var(--paper-sunk);
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
   }
 
-  .intro__media :global(img) {
+  .intro__track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .intro__track--animated {
+    /* animation-duration is set inline per-page (build-time computed from
+       image count) — see the component frontmatter. It's a different
+       longhand property from animation-name below, so the inline value and
+       this stylesheet don't conflict, and the reduced-motion override still
+       fully disables the animation regardless of the inline duration. */
+    animation-name: hero-slide;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro__track--animated {
+      animation-name: none;
+    }
+  }
+
+  .intro__slide {
+    position: relative;
+    flex: 0 0 100%;
+  }
+
+  .intro__slide :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+  }
+
+  /* Bottom-left, mirroring .intro__pause's pill in the opposite corner —
+     same "text-over-image" scrim treatment as .project-popover__count. */
+  .intro__caption {
+    position: absolute;
+    bottom: var(--space-s);
+    inset-inline-start: var(--space-s);
+    /* Leaves room for the pause button in the opposite corner: this
+       caption's own left inset, a gap, the button's width, and its own
+       right inset — all --space-s, plus the button's 2.75rem diameter. */
+    max-width: calc(100% - (var(--space-s) * 3) - 2.75rem);
+    padding: var(--space-3xs) var(--space-2xs);
+    border-radius: 999px;
+    background: var(--scrim);
+    color: var(--paper);
+    font-size: var(--step--1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ===================================================================
+     Pause control — zero JavaScript. A visually-hidden checkbox drives
+     animation-play-state on its sibling .intro__track via :checked, and
+     swaps the label's pause/play icon the same way SiteHeader.astro swaps
+     its hamburger ⇄ ✕ icon off #site-nav[open]. The checkbox must precede
+     .intro__track in the DOM for the ~ sibling selector to reach it.
+     =================================================================== */
+
+  #hero-pause:checked ~ .intro__track {
+    animation-play-state: paused;
+  }
+
+  .intro__pause {
+    position: absolute;
+    bottom: var(--space-s);
+    inset-inline-end: var(--space-s);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--scrim);
+    color: var(--paper);
+    cursor: pointer;
+  }
+
+  .intro__pause:hover {
+    background: var(--ink);
+  }
+
+  #hero-pause:focus-visible ~ .intro__pause {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  /* Icons drawn in CSS, no icon font/emoji dependency — same approach as
+     the hamburger bars in SiteHeader.astro. */
+  .intro__pause-icon--pause {
+    display: flex;
+    gap: 3px;
+  }
+
+  .intro__pause-icon--pause span {
+    display: block;
+    width: 3px;
+    height: 13px;
+    background: currentColor;
+    border-radius: 1px;
+  }
+
+  .intro__pause-icon--play {
+    display: none;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 7px 0 7px 11px;
+    border-color: transparent transparent transparent currentColor;
+    margin-inline-start: 3px;
+  }
+
+  #hero-pause:checked ~ .intro__pause .intro__pause-icon--pause {
+    display: none;
+  }
+
+  #hero-pause:checked ~ .intro__pause .intro__pause-icon--play {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro__pause {
+      display: none;
+    }
   }
 
   .grid {

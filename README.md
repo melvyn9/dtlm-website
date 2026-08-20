@@ -4,12 +4,13 @@ The practice website for DTLM Architect, Kuala Lumpur. It is a **static site**:
 there is no database and no server to maintain. Content lives in text files in
 this folder, and the site is rebuilt automatically whenever those files change.
 
-**Routine content edits — Selected Works, Awards & Recognition, News, Museums,
-Books — don't need any of the below.** Log
+**Routine content edits — Selected Works, the hero gallery, Awards &
+Recognition, News, Museums, Books — don't need any of the below.** Log
 into **`/admin/`** on the live site with your GitHub account and use the form.
-See [section 3](#3-how-to-add-a-new-project) and
-[section 5](#5-how-to-add-an-award-or-press-mention) for what that covers, and
-[section 10](#10-where-the-accounts-live) for how the login is set up.
+See [section 3](#3-how-to-add-a-new-project),
+[section 4](#4-how-to-edit-the-hero-gallery), and
+[section 6](#6-how-to-add-an-award-or-press-mention) for what that covers, and
+[section 11](#11-where-the-accounts-live) for how the login is set up.
 
 This document is written for a tech-savvy person who is not a developer, and
 covers everything the CMS doesn't: the technical fallback for editing files by
@@ -25,16 +26,17 @@ a text file and use a web browser, you can maintain this site either way.
 1. [Before you start](#1-before-you-start)
 2. [How to preview the site on your own computer](#2-how-to-preview-the-site-on-your-own-computer)
 3. [How to add a new project](#3-how-to-add-a-new-project)
-4. [How to add a team member](#4-how-to-add-a-team-member)
-5. [How to add an award or press mention](#5-how-to-add-an-award-or-press-mention)
-6. [Preparing images](#6-preparing-images)
-7. [How to write good alt text](#7-how-to-write-good-alt-text)
-8. [How deployment works](#8-how-deployment-works)
-9. [How to roll back a bad deploy](#9-how-to-roll-back-a-bad-deploy)
-10. [Where the accounts live](#10-where-the-accounts-live)
-11. [Pre-publication checklist](#11-pre-publication-checklist)
-12. [If the build fails](#12-if-the-build-fails)
-13. [For developers](#13-for-developers)
+4. [How to edit the hero gallery](#4-how-to-edit-the-hero-gallery)
+5. [How to add a team member](#5-how-to-add-a-team-member)
+6. [How to add an award or press mention](#6-how-to-add-an-award-or-press-mention)
+7. [Preparing images](#7-preparing-images)
+8. [How to write good alt text](#8-how-to-write-good-alt-text)
+9. [How deployment works](#9-how-deployment-works)
+10. [How to roll back a bad deploy](#10-how-to-roll-back-a-bad-deploy)
+11. [Where the accounts live](#11-where-the-accounts-live)
+12. [Pre-publication checklist](#12-pre-publication-checklist)
+13. [If the build fails](#13-if-the-build-fails)
+14. [For developers](#14-for-developers)
 
 ---
 
@@ -91,8 +93,8 @@ browser updates by itself. Press `Ctrl+C` in the terminal to stop.
 1. Go to `/admin/` on the live site and sign in with GitHub.
 2. Open **Selected Works** → **New Project**.
 3. Fill in the form and drag your image onto the **Hero image** field — see
-   [section 6](#6-preparing-images) for what makes a good one, and
-   [section 7](#7-how-to-write-good-alt-text) for the alt text field.
+   [section 7](#7-preparing-images) for what makes a good one, and
+   [section 8](#8-how-to-write-good-alt-text) for the alt text field.
 4. To show more than one photo, add them under **Additional gallery
    images** — visitors can swipe or scroll through hero + gallery together
    as one sequence in the project's popup. Drag entries by their handle to
@@ -102,14 +104,14 @@ browser updates by itself. Press `Ctrl+C` in the terminal to stop.
    site once you turn it off.
 6. Click **Save**. That's it — no terminal, no Git. The CMS commits the file
    straight to the site's source, which redeploys automatically within a
-   couple of minutes (see [section 8](#8-how-deployment-works)).
+   couple of minutes (see [section 9](#9-how-deployment-works)).
 
 > **The site will refuse to publish an incomplete project even through the
 > CMS.** If you turn Draft off while alt text is unwritten, the photographer
 > is unconfirmed, or image rights aren't ticked, the deploy fails rather than
 > publishing something wrong. Check the practice's GitHub repository's
 > **Actions** tab if a save doesn't seem to have taken effect — see
-> [section 12](#12-if-the-build-fails).
+> [section 13](#13-if-the-build-fails).
 
 The **Technical ID** field the CMS shows is just an internal label the page
 uses to identify the project's popup — it isn't a real web address the way it
@@ -121,7 +123,7 @@ Useful if the CMS is unavailable, or you're comfortable with a text editor and
 Git and would rather work that way. Produces the exact same file the CMS
 would.
 
-**Step 1 — prepare the image.** Read [section 6](#6-preparing-images) first.
+**Step 1 — prepare the image.** Read [section 7](#7-preparing-images) first.
 Save the finished image into `src/assets/projects/`, named after the project
 in lowercase with hyphens: `verandah-house.jpg`
 
@@ -137,7 +139,7 @@ description. The template explains each field. The important ones:
 |---|---|
 | `slug` | An internal id used for the project's popup on the page — no longer a real web address (the site is a single scrollable page now). Lowercase, hyphens, doesn't need to be exact. |
 | `year`, `location`, `status`, `typology` | All required. `status` and `typology` must be one of the listed values, spelled exactly. |
-| `heroImageAlt` | Required. See [section 7](#7-how-to-write-good-alt-text). |
+| `heroImageAlt` | Required. See [section 8](#8-how-to-write-good-alt-text). |
 | `gallery` | Optional. Extra photos shown after the hero image in a swipeable gallery. List order is display order. Each entry's `alt` follows the exact same rules as `heroImageAlt`. |
 | `photographer` | Required. The photographer's name, or `In-house`. |
 | `imageRightsConfirmed` | Must be `true` before the project can go live. Only set this once you have actually checked. |
@@ -150,26 +152,83 @@ description. The template explains each field. The important ones:
 section (if `featured: true`).
 
 **Step 5 — publish it.** Work through the
-[pre-publication checklist](#11-pre-publication-checklist), then change
+[pre-publication checklist](#12-pre-publication-checklist), then change
 `draft: true` to `draft: false`, save, and follow
-[section 8](#8-how-deployment-works).
+[section 9](#9-how-deployment-works).
 
 > **The site will refuse to build if a project is incomplete.** If you set
 > `draft: false` while alt text is still unwritten, the photographer is
 > unconfirmed, or image rights are not ticked, the build stops with a message
-> naming the problem. This is on purpose — see [section 12](#12-if-the-build-fails).
+> naming the problem. This is on purpose — see [section 13](#13-if-the-build-fails).
 
 ---
 
-## 4. How to add a team member
+## 4. How to edit the hero gallery
+
+The top of the homepage shows a gallery of images above the "An architectural
+practice in Kuala Lumpur..." statement. With two or more images it
+auto-advances left to right on its own, on a timer — no clicking needed.
+With exactly one image it just displays, still. With none, the statement
+shows on its own with no image, same as before this existed.
+
+### The easy way — the CMS
+
+Go to `/admin/` and sign in. In the sidebar, open **Hero**. It's a single
+settings page, not a list of entries — add, remove, or reorder images there,
+give each one alt text, and optionally a caption. The order they're listed
+in is the order they cycle through.
+
+### The manual way — editing the file directly
+
+Everything lives in one file: `src/content/hero/index.md`.
+
+```yaml
+---
+images:
+  - image: ../../assets/hero/tan-loke-mun-portrait.jpg
+    alt: Ar. Dr. Tan Loke Mun seated against a textured concrete wall
+  - image: ../../assets/hero/kemaris-house-dusk.jpg
+    alt: Kemaris House facade at dusk with warm interior lighting
+    caption: Kemaris House
+---
+```
+
+1. Save each image into `src/assets/hero/` — see
+   [section 7](#7-preparing-images) for sizing.
+2. Add an entry to the `images` list for each one, in the order they should
+   cycle. Alt text is required — see
+   [section 8](#8-how-to-write-good-alt-text).
+3. `caption` is optional — a short visible label shown over the photo, e.g.
+   a project name. It's separate from alt text on purpose: alt text describes
+   the photo for someone who can't see it, while a caption names the subject
+   for everyone. Leave it out for an image with no single project to name,
+   like a portrait.
+4. To go back to text-only, set `images: []`.
+
+There's no `draft` field here — unlike a project, there's no legitimate
+half-finished state for a single image-and-caption pair. An entry is either
+added and correct, or not added yet.
+
+### Timing and accessibility
+
+Each image holds for about 5 seconds before transitioning to the next. A
+pause button sits in the corner of the gallery whenever there's more than one
+image — required by the same accessibility standard (WCAG) this site holds
+itself to elsewhere, since anything that moves on its own for more than a
+few seconds needs a way to stop it. Visitors with "reduce motion" turned on
+in their operating system see the first image only, static, with no pause
+button — there's nothing to pause.
+
+---
+
+## 5. How to add a team member
 
 **Not in the CMS** — this collection is edited by hand only, the same manual
-pattern as section 3's fallback method. Also worth knowing: the homepage
-currently only ever shows the principal's headshot and name (pulled onto the
-Hero section by matching `SITE.principal` in `src/consts.js`) — there's no
-standalone team page anymore, so adding someone here doesn't put them
-anywhere on the live site yet. That's a placeholder for future work, not a
-bug.
+pattern as section 3's fallback method. Also worth knowing: this collection
+isn't shown anywhere on the live site currently — the homepage's hero gallery
+(section 4) is edited separately and independently of team entries. Adding
+someone here doesn't put them anywhere on the live site yet. That's a
+placeholder for future work, not a bug.
 
 1. Save a headshot into `src/assets/team/` — square crop, max 1200px, under
    500KB. Name it `firstname-lastname.jpg`.
@@ -186,7 +245,7 @@ To remove someone, either delete their file or set `draft: true`.
 
 ---
 
-## 5. How to add an award or press mention
+## 6. How to add an award or press mention
 
 This one collection of files backs **four different sections** on the
 homepage: Awards & Recognition, News, Museums, and Books. Which section an
@@ -241,7 +300,7 @@ featured: true
 
 ---
 
-## 6. Preparing images
+## 7. Preparing images
 
 Getting this right is the single biggest thing you can do for the site's speed.
 
@@ -277,7 +336,7 @@ size above and the rest is handled.
 
 ---
 
-## 7. How to write good alt text
+## 8. How to write good alt text
 
 Alt text is what a blind visitor's screen reader reads aloud in place of the
 image. It is also what appears if the image fails to load, and it is the single
@@ -332,7 +391,7 @@ building, rewrite it.
 
 ---
 
-## 8. How deployment works
+## 9. How deployment works
 
 Every change — whether saved through the CMS or pushed by hand — lands on
 this repository's `main` branch on GitHub. From there, deployment is
@@ -345,7 +404,7 @@ automatic. You never upload files by hand either way.
 > `main` today is an internal-only **GitHub Pages** preview
 > (`.github/workflows/gh-pages.yml`), used for showing people how the site
 > looks before it's really live. Update this note once Cloudflare Pages is
-> connected — see [section 10](#10-where-the-accounts-live).
+> connected — see [section 11](#11-where-the-accounts-live).
 
 ### To publish a change by hand (skip this if you used the CMS)
 
@@ -368,7 +427,7 @@ site, and publishes it — usually within two minutes.
      hard refresh (`Ctrl+Shift+R` / `Cmd+Shift+R`) if you still see the old
      version.
    - **Failed** → click into it and read the log. The error is almost always
-     a content mistake; see [section 12](#12-if-the-build-fails). **The live
+     a content mistake; see [section 13](#13-if-the-build-fails). **The live
      site is unchanged when a build fails** — a broken build cannot take the
      site down.
 3. Check the page on a phone as well as a laptop.
@@ -394,7 +453,7 @@ Cloudflare comments the preview URL on the branch.
 
 ---
 
-## 9. How to roll back a bad deploy
+## 10. How to roll back a bad deploy
 
 Something went live that should not have. Two ways to fix it, fastest first.
 
@@ -408,7 +467,7 @@ Something went live that should not have. Two ways to fix it, fastest first.
 The live site reverts immediately. **Note:** this does not change the files in
 this folder — the next `git push` will deploy them again. Use option B to fix
 the underlying cause. (Until Cloudflare Pages is connected — see
-[section 8](#8-how-deployment-works) — there is no equivalent instant
+[section 9](#9-how-deployment-works) — there is no equivalent instant
 rollback; go straight to option B.)
 
 ### Option B — undo the change properly
@@ -439,7 +498,7 @@ git restore .
 
 ---
 
-## 10. Where the accounts live
+## 11. Where the accounts live
 
 Fill this in and keep it current. **This table is the reason this document
 exists** — the most common way a site like this becomes unmaintainable is that
@@ -454,7 +513,7 @@ the one person who knew where everything lived moves on.
 | CMS login backend | GitHub OAuth App (`GitHub → Settings → Developer settings → OAuth Apps`) | melvyn9 | | Lets the CMS ask GitHub to verify who's logging in. Holds a Client ID and Client Secret |
 | CMS login backend (hosting) | Cloudflare Worker, `sveltia-cms-auth`, at `sveltia-cms-auth.melvyn9.workers.dev` | melvyn9 | | Deployed from `github.com/sveltia/sveltia-cms-auth` (not part of this repo). Holds the OAuth App's Client ID/Secret as Worker secrets, and an `ALLOWED_DOMAINS` list restricting which sites may use it |
 | Hosting / build (preview) | **GitHub Pages** — `melvyn9.github.io/dtlm-website/` | melvyn9 | | Internal preview only, not the real domain. Auto-deploys on every push to `main` via `.github/workflows/gh-pages.yml` |
-| Hosting / build (production) | Cloudflare Pages | *[TO CONFIRM]* | | **Not yet connected** — see [section 8](#8-how-deployment-works). Intended to serve `dtlm.com.my` from this repo's `main` branch. Free tier |
+| Hosting / build (production) | Cloudflare Pages | *[TO CONFIRM]* | | **Not yet connected** — see [section 9](#9-how-deployment-works). Intended to serve `dtlm.com.my` from this repo's `main` branch. Free tier |
 | Contact form | Web3Forms | *[TO CONFIRM]* | | Access key is in `src/consts.js` |
 | Analytics | Cloudflare Web Analytics | *[TO CONFIRM]* | | Cookieless — no consent banner needed |
 
@@ -464,7 +523,7 @@ the one person who knew where everything lived moves on.
 
 ---
 
-## 11. Pre-publication checklist
+## 12. Pre-publication checklist
 
 Run through this before setting `draft: false` on anything.
 
@@ -499,7 +558,7 @@ Run through this before setting `draft: false` on anything.
 
 ---
 
-## 12. If the build fails
+## 13. If the build fails
 
 **A failed build cannot break the live site.** The previous version stays up
 — whether the change came from the CMS or a manual push. Take your time.
@@ -507,14 +566,14 @@ Run through this before setting `draft: false` on anything.
 **Where to look:** if a CMS save doesn't seem to have taken effect after a
 couple of minutes, check the repository's **Actions** tab on GitHub (or the
 Cloudflare Pages **Deployments** tab, once that's connected — see
-[section 8](#8-how-deployment-works)) for a failed run, and open it to read
+[section 9](#9-how-deployment-works)) for a failed run, and open it to read
 the error.
 
 The error message names the file and the problem. The common ones:
 
 | Message contains | What it means | Fix |
 |---|---|---|
-| `heroImageAlt still contains a placeholder` | Alt text was left as `[CONFIRM ...]` | Write real alt text — [section 7](#7-how-to-write-good-alt-text) |
+| `heroImageAlt still contains a placeholder` | Alt text was left as `[CONFIRM ...]` | Write real alt text — [section 8](#8-how-to-write-good-alt-text) |
 | `photographer still contains a placeholder` | Credit not filled in | Name the photographer, or write `In-house` |
 | `imageRightsConfirmed must be true` | Rights not yet checked | Confirm the rights, then set it to `true` |
 | `heroImageAlt repeats the project title` | Alt text is just the project name | Describe the building instead |
@@ -531,7 +590,7 @@ developer. It names the file and line.
 
 ---
 
-## 13. For developers
+## 14. For developers
 
 ### How the site fits together
 
@@ -577,7 +636,7 @@ There is no runtime backend and no database anywhere in this picture.
 - **Content collections + Zod** (`src/content.config.ts`) are the schema
   every project/press/team entry is checked against at build time. This is
   the one real gate in the whole system — see
-  [section 12](#12-if-the-build-fails) and
+  [section 13](#13-if-the-build-fails) and
   [the draft mechanism](#the-draft-mechanism) below.
 - **[Sveltia CMS](https://sveltiacms.app)** is the form-based editing screen
   at `/admin/` (`public/admin/index.html` + `config.yml`). It's a
@@ -593,10 +652,10 @@ There is no runtime backend and no database anywhere in this picture.
   [`sveltia/sveltia-cms-auth`](https://github.com/sveltia/sveltia-cms-auth),
   not part of this repository) handles the "Sign in with GitHub" OAuth
   handshake — the one piece of infrastructure that exists purely so the CMS
-  can prove who's logging in. See [section 10](#10-where-the-accounts-live).
+  can prove who's logging in. See [section 11](#11-where-the-accounts-live).
 - **Hosting**: static files are deployed to GitHub Pages today (internal
   preview only) and are intended for Cloudflare Pages in production — see
-  [section 8](#8-how-deployment-works) for current status.
+  [section 9](#9-how-deployment-works) for current status.
 - **Web3Forms** handles the contact form as a plain HTML POST — no JavaScript
   fetch call, no form backend of our own.
 - **Cloudflare Web Analytics** is cookieless, injected at the edge, so no
@@ -742,8 +801,10 @@ src/
                           scrollable page); a few standalone pages remain —
                           accessibility, privacy, contact/thank-you, 404
   content/projects/      One Markdown file per project — "Selected Works"
-  content/team/          One Markdown file per person (Hero headshot only —
-                          not surfaced elsewhere yet, not in the CMS)
+  content/hero/          Singleton: index.md holds the homepage hero
+                          gallery's image list, in the CMS as "Hero"
+  content/team/          One Markdown file per person (not surfaced
+                          anywhere on the site yet, not in the CMS)
   content/press/         One Markdown file per award/publication/talk/
                           museum/book — the `kind` field decides which
                           homepage section it appears in
@@ -762,7 +823,7 @@ scripts/
 Note: the CMS's GitHub OAuth backend (`sveltia-cms-auth`) is **not** part of
 this repository — it's deployed separately from
 [`sveltia/sveltia-cms-auth`](https://github.com/sveltia/sveltia-cms-auth).
-See [section 10](#10-where-the-accounts-live).
+See [section 11](#11-where-the-accounts-live).
 
 ### The draft mechanism
 

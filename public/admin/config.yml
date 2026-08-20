@@ -210,6 +210,58 @@ collections:
         hint: "The main descriptive copy for this project."
 
   # ===========================================================================
+  # HERO GALLERY  →  src/content/hero/index.md
+  # A single settings-style file, not a folder of entries — hence a "file"
+  # collection rather than "folder", editing the one file directly.
+  # ===========================================================================
+  - name: hero
+    label: "Hero"
+    files:
+      - name: images
+        label: "Hero Gallery"
+        file: "src/content/hero/index.md"
+        fields:
+          - label: "Images"
+            name: images
+            widget: list
+            required: false
+            summary: "{{fields.alt}}"
+            hint: >-
+              Drag entries by their handle (⠿) to reorder — this sets the
+              order they cycle through on the homepage. Leave empty to show
+              just the headline text with no image.
+            fields:
+              - label: "Image"
+                name: image
+                widget: image
+                required: true
+                # Sveltia CMS requires media_folder to be an absolute,
+                # repo-root path for file collections (this "Hero" section
+                # has no `folder:`, so there's no collection folder for a
+                # relative path to resolve against — a relative value here
+                # silently fails to save the file). public_folder stays
+                # relative on purpose: that's the string written into
+                # index.md's frontmatter, and Astro's image() schema needs
+                # a path relative to the content file to import it, the same
+                # as every other image field in this config.
+                media_folder: "/src/assets/hero"
+                public_folder: "../../assets/hero"
+              - label: "Alt text"
+                name: alt
+                widget: text
+                required: true
+                pattern: ["^[\\s\\S]{15,}$", "At least 15 characters"]
+                hint: "Describe what's in this specific photo."
+              - label: "Caption (optional)"
+                name: caption
+                widget: string
+                required: false
+                hint: >-
+                  Shown as a visible label over the photo, e.g. a project
+                  name — "Kemaris House". Leave blank for no caption (for
+                  example, a portrait with no single project to name).
+
+  # ===========================================================================
   # AWARDS & RECOGNITION  →  src/content/press/*.md, kind: award
   # ===========================================================================
   - name: press_awards
