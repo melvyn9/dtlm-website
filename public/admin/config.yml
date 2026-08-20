@@ -2,8 +2,11 @@
 #
 # This reads and writes the exact same Markdown files in src/content/ that
 # src/content.config.ts already validates at build time. Saving here commits
-# straight to `main`; the existing Cloudflare Pages git integration builds and
-# deploys it exactly like any other commit. See src/content.config.ts for the
+# straight to `main`. As of this writing the only live deployment building
+# from `main` is the internal GitHub Pages preview
+# (.github/workflows/gh-pages.yml) — there is no Cloudflare Pages production
+# deployment connected yet. Once one exists, it'll pick up these commits the
+# same way. See src/content.config.ts for the
 # authoritative schema — this file only narrows the space of accidental
 # mistakes (typos, missing fields, malformed URLs); it cannot and does not
 # replace that schema as the real gate. In particular the placeholder-text
@@ -15,10 +18,7 @@
 backend:
   name: github
   repo: melvyn9/dtlm-website
-  # TEMPORARY: rehearsing the real login-and-commit flow against a scratch
-  # branch before trusting it against main. Switch back to `main` once a test
-  # entry's resulting commit has been inspected and looks right.
-  branch: cms-test
+  branch: main
   base_url: https://sveltia-cms-auth.melvyn9.workers.dev
 
 # Local testing: open http://localhost:4321/admin/index.html in Chrome or
