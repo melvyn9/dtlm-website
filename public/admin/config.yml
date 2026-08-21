@@ -28,6 +28,19 @@ backend:
 media_folder: src/assets/uploads
 public_folder: src/assets/uploads
 
+# Sanitises uploaded filenames (spaces/accents → hyphens, lowercased) —
+# matches this site's own filename convention (README.md §6: "lowercase,
+# hyphens, no spaces"). Added after an upload with a space in its filename
+# ("Long view towards main home.jpg") saved its frontmatter reference but
+# silently failed to write the actual file for the Hero collection — the
+# working theory is that spaces broke the write path for file collections
+# specifically. This won't fix files already uploaded that way, but stops
+# new ones from repeating it.
+media_libraries:
+  default:
+    config:
+      slugify_filename: true
+
 collections:
   # ===========================================================================
   # SELECTED WORKS  →  src/content/projects/*.md
