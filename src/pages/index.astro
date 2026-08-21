@@ -87,7 +87,7 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
     <section class={`intro section ${heroImages.length > 0 ? 'intro--with-photo' : ''}`}>
       {
         heroImages.length > 0 && (
-          <div class="intro__media">
+          <div class="intro__media reveal-onload">
             {heroAnimated && <input type="checkbox" id="hero-pause" class="visually-hidden" />}
             <div
               class={`intro__track ${heroAnimated ? 'intro__track--animated' : ''}`}
@@ -121,7 +121,7 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
         )
       }
 
-      <div class="intro__text">
+      <div class="intro__text reveal-onload">
         <h1 class="intro__statement">
           An architectural practice in Kuala Lumpur, working across houses,
           civic buildings and interiors.
@@ -141,11 +141,11 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
 
   {
     featured.length > 0 && (
-      <section id="selected-works" class="wrap section--tight" aria-labelledby="selected-works-heading">
-        <h2 id="selected-works-heading">{t['home.selected']}</h2>
+      <section id="selected-works" class="wrap section--tight reveal" aria-labelledby="selected-works-heading">
+        <h2 id="selected-works-heading" class="reveal__item">{t['home.selected']}</h2>
         <ul class="grid">
           {featured.map((project, i) => (
-            <li>
+            <li class="reveal__item">
               <ProjectCard
                 slug={project.data.slug}
                 title={project.data.title}
@@ -192,8 +192,8 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
   <PressSection id="museums" heading={t['press.museums']} items={museumItems} />
   <PressSection id="books" heading={t['press.books']} items={bookItems} />
 
-  <section id="contact" class="wrap section--tight" aria-labelledby="contact-heading">
-    <h2 id="contact-heading">{t['contact.title']}</h2>
+  <section id="contact" class="wrap section--tight reveal" aria-labelledby="contact-heading">
+    <h2 id="contact-heading" class="reveal__item">{t['contact.title']}</h2>
 
     {
       (!CONTACT.verified || !FORM.configured) && import.meta.env.DEV && (
@@ -205,7 +205,7 @@ const bookItems = press.filter((p) => p.data.kind === 'book');
       )
     }
 
-    <div class="contact-layout">
+    <div class="contact-layout reveal__item">
       <section class="details" aria-labelledby="contact-details">
         <h3 id="contact-details" class="visually-hidden">Contact details</h3>
 

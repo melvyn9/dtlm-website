@@ -17,16 +17,18 @@ interface Props {
 const { id, heading, items, emptyMessage } = Astro.props;
 ---
 
-<section id={id} class="wrap section--tight press-section" aria-labelledby={`${id}-heading`}>
-  <h2 id={`${id}-heading`}>{heading}</h2>
-  {
-    items.length > 0 ? (
-      <PressList items={items} />
-    ) : (
-      <p class="empty">{emptyMessage ?? t['press.comingSoon']}</p>
-    )
-  }
-  <slot />
+<section id={id} class="wrap section--tight press-section reveal" aria-labelledby={`${id}-heading`}>
+  <h2 id={`${id}-heading`} class="reveal__item">{heading}</h2>
+  <div class="reveal__item">
+    {
+      items.length > 0 ? (
+        <PressList items={items} />
+      ) : (
+        <p class="empty">{emptyMessage ?? t['press.comingSoon']}</p>
+      )
+    }
+    <slot />
+  </div>
 </section>
 
 <style>

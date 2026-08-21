@@ -241,6 +241,109 @@ main {
   padding-block: var(--space-xl);
 }
 
+/*
+ * Scroll-triggered "fade-up" reveal. `.reveal` goes on a section/group root;
+ * `.reveal__item` on each direct child that should fade up (heading, body,
+ * media, grid item, ...), staggered via the :nth-child rules below.
+ *
+ * Built on the CSS `animation-trigger` "play-once" action (Chrome 145+,
+ * 2026) rather than the older, broadly-supported `animation-timeline:
+ * view()`: view() is continuously scroll-linked, so it replays/reverses
+ * every time a visitor scrolls back up past the trigger point — that
+ * conflicts with "reveal once and stay revealed". `play-once` genuinely
+ * fires once and ignores the trigger on every subsequent pass, matching
+ * the spec exactly. Verified empirically (not just read off docs, since
+ * this API is brand new and its exact property names are still settling):
+ * fires once on the way down, doesn't reverse on scroll-back, doesn't
+ * replay on a second pass through the trigger band.
+ *
+ * Everything lives inside this @supports guard so an unsupported browser
+ * (Firefox/Safari today) gets no opacity/transform override at all —
+ * content just renders fully visible immediately, the same
+ * progressive-enhancement fallback as every other feature on this site,
+ * not a broken or permanently-hidden state. The @supports condition tests
+ * the *exact* declaration used below, not just the property name, so a
+ * typo here fails safe (content stays visible) rather than half-applying.
+ * Reduced-motion is doubly covered: gated out here by
+ * `prefers-reduced-motion: no-preference`, and independently neutralised
+ * by the blanket reduced-motion override above (§7) if either gate were
+ * somehow bypassed.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-trigger: --reveal play-once none) {
+    .reveal {
+      timeline-trigger-name: --reveal;
+      timeline-trigger-source: view();
+      timeline-trigger-activation-range-start: entry 0%;
+      timeline-trigger-activation-range-end: entry 20%;
+    }
+
+    .reveal__item {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: reveal-fade-up 1s ease-out both;
+      animation-trigger: --reveal play-once none;
+    }
+
+    /* Stagger: ~150ms between items, capped at the 6th so a long list
+       (e.g. a big project grid) doesn't get a silly-long tail. */
+    .reveal__item:nth-child(2) {
+      animation-delay: 150ms;
+    }
+    .reveal__item:nth-child(3) {
+      animation-delay: 300ms;
+    }
+    .reveal__item:nth-child(4) {
+      animation-delay: 450ms;
+    }
+    .reveal__item:nth-child(5) {
+      animation-delay: 600ms;
+    }
+    .reveal__item:nth-child(n + 6) {
+      animation-delay: 750ms;
+    }
+  }
+}
+
+/*
+ * `.reveal-onload` — same fade-up, but for content that's already visible
+ * the moment the page paints (the hero, above the fold). A view()-sourced
+ * scroll trigger genuinely cannot fire for this case: its "entry" phase is
+ * the scroll distance over which an element arrives from below the
+ * viewport, and there's no earlier scroll position for an already-visible
+ * element to have arrived from — confirmed empirically, not assumed (an
+ * `.reveal`/`.reveal__item` hero sat at opacity: 0 indefinitely with no
+ * scroll able to trigger it). A plain, untriggered animation sidesteps the
+ * problem entirely and, as a bonus, needs no @supports gate: it has no
+ * scroll-timeline dependency, so it plays the same way in every browser,
+ * not just Chrome/Edge.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-onload {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: reveal-fade-up 1s ease-out both;
+  }
+
+  .reveal-onload:nth-child(2) {
+    animation-delay: 150ms;
+  }
+  .reveal-onload:nth-child(3) {
+    animation-delay: 300ms;
+  }
+}
+
+@keyframes reveal-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Utility --------------------------------------------------------------- */
 
 .visually-hidden {
