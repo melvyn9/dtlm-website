@@ -38,29 +38,28 @@ export const SITE = {
 };
 
 /**
- * Contact details.
- *
- * TODO(unverified): address, phone and email could not be read from the
- * existing site during the Phase 0 audit — its robots.txt was returning
- * HTTP 508 and the /contact/ page fetch failed. These are placeholders and
- * MUST be confirmed with the practice before launch. They are deliberately
- * obvious rather than plausible, so they cannot ship unnoticed.
+ * Contact details. Confirmed with the practice on 21 Aug 2026.
  */
 export const CONTACT = {
-  addressLines: ['[CONFIRM ADDRESS LINE 1]', '[CONFIRM ADDRESS LINE 2]', 'Kuala Lumpur, Malaysia'],
-  phone: '[CONFIRM PHONE]',
-  phoneHref: '',
-  email: '[CONFIRM EMAIL]',
+  addressLines: [
+    'DRTAN LM ARCHITECT',
+    'Reg No: SP/T 139',
+    'No 19, Jalan SS15/4C',
+    'Subang Jaya, 47500 Selangor',
+    'Malaysia',
+  ],
+  phone: '(603) 5635 0055',
+  phoneHref: '+60356350055',
+  email: 'info@dtlm.com.my',
 
   /**
    * Static map image linked to Google Maps. Brief §4 forbids an embedded
    * Google Maps iframe — heavy third-party JS and an accessibility problem.
    */
   mapImage: '/images/map-static.png',
-  mapLink: 'https://www.google.com/maps/search/?api=1&query=Kuala+Lumpur',
+  mapLink: 'https://maps.app.goo.gl/XwTCzATtewRXFmgP9',
 
-  /** Set to false until CONTACT details above are confirmed. */
-  verified: false,
+  verified: true,
 };
 
 /**

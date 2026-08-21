@@ -268,14 +268,39 @@ main {
  * `prefers-reduced-motion: no-preference`, and independently neutralised
  * by the blanket reduced-motion override above (§7) if either gate were
  * somehow bypassed.
+ *
+ * The activation range spans the element's *entire* visible lifetime
+ * (`cover 0%` to `cover 100%`), not a narrow "just starting to enter"
+ * sliver — found empirically, the hard way: a narrower band (e.g.
+ * `entry 0%`–`entry 20%`) only ever gets sampled while the browser is
+ * actually rendering intermediate scroll positions. A hard refresh (or a
+ * nav link, e.g. `/#awards`) that lands the browser directly on a section
+ * — with `scroll-behavior: smooth` playing no part, since there's no
+ * scroll at all, just initial positioning — skips every position in
+ * between and the trigger never gets sampled while "inside" a narrow
+ * band, leaving that section stuck at opacity: 0 forever. A `:target`-based
+ * patch was tried and rejected too: it visually forces the section open
+ * while it's the current URL fragment, but the underlying animation still
+ * never actually played, so the moment the visitor navigates to a
+ * *different* in-page anchor and `:target` moves on, the section reverts
+ * to its unplayed opacity: 0 state and the content vanishes again — worse
+ * than the original bug. Covering the entire visible lifetime means any
+ * arrival position, including one with no preceding scroll at all, falls
+ * inside the band and genuinely fires the trigger (verified with a direct
+ * hash-navigation test), so the "already fired, stays fired" guarantee is
+ * real and doesn't depend on staying on that particular URL fragment.
+ * Trade-off: on an ordinary scroll down the page, sections now reveal
+ * essentially as soon as they start coming into view, rather than waiting
+ * until ~15–20% is visible — a minor, acceptable difference against a
+ * section that can otherwise never appear at all.
  */
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-trigger: --reveal play-once none) {
     .reveal {
       timeline-trigger-name: --reveal;
       timeline-trigger-source: view();
-      timeline-trigger-activation-range-start: entry 0%;
-      timeline-trigger-activation-range-end: entry 20%;
+      timeline-trigger-activation-range-start: cover 0%;
+      timeline-trigger-activation-range-end: cover 100%;
     }
 
     .reveal__item {

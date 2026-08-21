@@ -68,6 +68,17 @@ for (const [path, label] of PAGES) {
 
   await page.goto(BASE + path, { waitUntil: 'networkidle' });
 
+  /**
+   * Sections fade up into view (global.css: `.reveal`/`.reveal-onload`).
+   * Scanning immediately would sometimes catch text mid-transition — real,
+   * but momentary, reduced opacity reads as a contrast violation to axe even
+   * though a visitor never rests their eyes on that half-second frame. The
+   * longest possible settle time is the reveal's 1s duration plus its
+   * longest stagger delay (750ms, the `nth-child(n+6)` cap) — wait that out
+   * so the scan reflects the page's steady state, not a transient frame.
+   */
+  await page.waitForTimeout(1900);
+
   // Baseline: how much content renders WITH JavaScript, for comparison below.
   const withJs = await page.evaluate(
     () => (document.querySelector('main')?.textContent ?? '').replace(/\s+/g, ' ').trim().length,
