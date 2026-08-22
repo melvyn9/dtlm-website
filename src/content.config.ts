@@ -374,8 +374,18 @@ const press = defineCollection({
      * Optional on purpose: several items in the existing archive are not
      * dated, and a required date field would only invite invented ones.
      * Undated items sort to the end of their group.
+     *
+     * The CMS's date widget writes an empty *string* (`date: ''`) into
+     * frontmatter when left blank, not a missing key — and `new Date('')` is
+     * an `Invalid Date`, which `z.coerce.date()` correctly rejects rather
+     * than silently accepting. `.optional()` only exempts `undefined`, so
+     * without this the field breaks the build the moment an editor leaves
+     * Date blank and uses dateNote instead (an approximate period, e.g.
+     * "Late 2023") — exactly the case this field exists for. Same class of
+     * CMS-quirk fix as `area` below, just for an empty string instead of an
+     * explicit `null`.
      */
-    date: z.coerce.date().optional(),
+    date: z.preprocess((val) => (val === '' ? undefined : val), z.coerce.date().optional()),
     /** Free-text date when only an issue or week is known, e.g. "Vol.36 Issue 1, 2024". */
     dateNote: z.string().optional(),
     /** Outbound link to the original coverage. */
