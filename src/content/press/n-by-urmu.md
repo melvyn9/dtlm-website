@@ -1,9 +1,9 @@
 ---
-title: +n By Urmu
+title: +n By UR-MU
 kind: museum
-source: +n By Urmu
-date: 2026-08-22
-dateNote: ''
+source: +n By UR-MU
+date: ''
+dateNote: Late 2023
 url: https://theplusn.com/
 project: ''
 featured: true
