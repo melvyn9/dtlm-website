@@ -224,55 +224,63 @@ collections:
 
   # ===========================================================================
   # HERO GALLERY  →  src/content/hero/index.md
-  # A single settings-style file, not a folder of entries — hence a "file"
-  # collection rather than "folder", editing the one file directly.
+  # A FOLDER collection with exactly one file, creation and deletion both
+  # disabled — same "singleton settings page" intent as before (there's only
+  # ever the one file to edit), but see the media_folder comment below for
+  # why it's no longer a "file" collection (files:).
   # ===========================================================================
   - name: hero
     label: "Hero"
-    files:
-      - name: images
-        label: "Hero Gallery"
-        file: "src/content/hero/index.md"
+    folder: "src/content/hero"
+    create: false
+    delete: false
+    fields:
+      - label: "Images"
+        name: images
+        widget: list
+        required: false
+        summary: "{{fields.alt}}"
+        hint: >-
+          Drag entries by their handle (⠿) to reorder — this sets the
+          order they cycle through on the homepage. Leave empty to show
+          just the headline text with no image.
         fields:
-          - label: "Images"
-            name: images
-            widget: list
+          - label: "Image"
+            name: image
+            widget: image
+            required: true
+            # Relative media_folder, resolved relative to this collection's
+            # own folder (src/content/hero) — same working pattern as
+            # Selected Works' gallery field above.
+            #
+            # This used to be a "file" collection (files:), which needs an
+            # ABSOLUTE media_folder for Astro's image() schema to resolve
+            # correctly (a relative one silently failed to save the file at
+            # all — see git history). But an absolute media_folder also hits
+            # a real Sveltia CMS bug: its GitHub-backend GraphQL query for
+            # the upload wrongly constructs the request path as absolute,
+            # which fails outright ("failed to fetch") the moment you try to
+            # upload an image — see sveltia/sveltia-cms#580 for the same
+            # class of path-construction bug elsewhere in the same code.
+            # Converting to a folder collection sidesteps the conflict
+            # entirely: relative paths resolve correctly for folder
+            # collections, with no absolute-path requirement to trigger it.
+            media_folder: "../../assets/hero"
+            public_folder: "../../assets/hero"
+          - label: "Alt text"
+            name: alt
+            widget: text
+            required: true
+            pattern: ["^[\\s\\S]{15,}$", "At least 15 characters"]
+            hint: "Describe what's in this specific photo."
+          - label: "Caption (optional)"
+            name: caption
+            widget: string
             required: false
-            summary: "{{fields.alt}}"
             hint: >-
-              Drag entries by their handle (⠿) to reorder — this sets the
-              order they cycle through on the homepage. Leave empty to show
-              just the headline text with no image.
-            fields:
-              - label: "Image"
-                name: image
-                widget: image
-                required: true
-                # Sveltia CMS requires media_folder to be an absolute,
-                # repo-root path for file collections (this "Hero" section
-                # has no `folder:`, so there's no collection folder for a
-                # relative path to resolve against — a relative value here
-                # silently fails to save the file). public_folder stays
-                # relative on purpose: that's the string written into
-                # index.md's frontmatter, and Astro's image() schema needs
-                # a path relative to the content file to import it, the same
-                # as every other image field in this config.
-                media_folder: "/src/assets/hero"
-                public_folder: "../../assets/hero"
-              - label: "Alt text"
-                name: alt
-                widget: text
-                required: true
-                pattern: ["^[\\s\\S]{15,}$", "At least 15 characters"]
-                hint: "Describe what's in this specific photo."
-              - label: "Caption (optional)"
-                name: caption
-                widget: string
-                required: false
-                hint: >-
-                  Shown as a visible label over the photo, e.g. a project
-                  name — "Kemaris House". Leave blank for no caption (for
-                  example, a portrait with no single project to name).
+              Shown as a visible label over the photo, e.g. a project
+              name — "Kemaris House". Leave blank for no caption (for
+              example, a portrait with no single project to name).
 
   # ===========================================================================
   # AWARDS & RECOGNITION  →  src/content/press/*.md, kind: award
